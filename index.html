@@ -256,6 +256,109 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
 @media(prefers-reduced-motion:reduce){.bienvenida.in,.bienvenida.in::after,.flash{animation:none}}
 </style>
 
+<style id="cariCss">
+/* ===== Mascota virtual (Cari = cartera / Billi = billetera) ===== */
+.mascot{position:fixed;left:0;top:0;z-index:850;width:var(--ms);height:var(--ms);--ms:72px;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;outline:0;will-change:transform;opacity:0;transition:opacity .5s}
+.mascot.on{opacity:1}
+.mascot.drag{cursor:grabbing}
+@media (min-width:701px){.mascot{--ms:88px}}
+.mascot .rig{position:absolute;inset:0;transform-origin:50% 92%;transition:transform .25s var(--pop)}
+.mascot.drag .rig{transform:scale(1.14) rotate(7deg)}
+.mascot svg{display:block;width:100%;height:100%;overflow:visible;fill:none;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;animation:mBob 2.8s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(var(--sh),.28))}
+.mascot[data-mood="sleep"] svg{animation:mBreathe 3.6s ease-in-out infinite;transform-origin:50% 95%}
+.mascot:focus-visible .rig{outline:2px solid var(--lime);outline-offset:4px;border-radius:24px}
+.mascot .sh{transform-box:fill-box;transform-origin:center;animation:mShadow 2.8s ease-in-out infinite}
+.mascot .blink{transform-box:fill-box;transform-origin:center;animation:mBlink 4.6s infinite}
+.mascot .arm{transform-box:fill-box;transform-origin:50% 12%}
+.mascot .hb{transform-box:fill-box;transform-origin:center;animation:mBeat .8s ease-in-out infinite}
+.mascot .snore{transform-box:fill-box;transform-origin:center;animation:mSnore 3.6s ease-in-out infinite}
+/* Partes de la cara: solo se muestra la del estado actual */
+.mascot .p{display:none}
+.mascot[data-mood="idle"] .k-idle,
+.mascot[data-mood="happy"] .k-happy,
+.mascot[data-mood="love"] .k-love,
+.mascot[data-mood="wow"] .k-wow,
+.mascot[data-mood="wink"] .k-wink,
+.mascot[data-mood="sleep"] .k-sleep,
+.mascot[data-mood="dance"] .k-dance{display:inline}
+/* Animaciones por emoción (se reinician al cambiar data-anim) */
+.mascot[data-anim="happy"] .rig{animation:mJump .7s var(--ease)}
+.mascot[data-anim="happy"] .arm-r{animation:mWave .7s ease-in-out 2}
+.mascot[data-anim="love"] .rig{animation:mLove 1.3s ease-in-out}
+.mascot[data-anim="wink"] .rig{animation:mTilt 1s ease-in-out}
+.mascot[data-anim="wow"] .rig{animation:mWow .7s var(--ease)}
+.mascot[data-anim="dance"] .rig{animation:mDance .55s ease-in-out 5}
+.mascot[data-anim="dance"] .arm-l{animation:mSwingL .55s ease-in-out 5}
+.mascot[data-anim="dance"] .arm-r{animation:mSwingR .55s ease-in-out 5}
+.mascot[data-anim="land"] .rig{animation:mLand .5s var(--ease)}
+/* Burbuja de texto */
+.mb{position:absolute;left:50%;bottom:calc(100% + 8px);width:max-content;max-width:150px;padding:7px 11px;border-radius:14px;background:var(--surface);color:var(--head);font:700 .74rem/1.25 var(--sans);text-align:center;box-shadow:0 0 0 1.5px var(--lime),0 10px 20px -8px rgba(var(--sh),.45);pointer-events:none;opacity:0;transform:translateX(calc(-50% + var(--bx,0px))) translateY(6px) scale(.9);transition:opacity .22s,transform .35s var(--pop)}
+.mb::after{content:"";position:absolute;left:calc(50% - var(--bx,0px));bottom:-5px;width:10px;height:10px;margin-left:-5px;background:var(--surface);transform:rotate(45deg);box-shadow:2px 2px 0 0 var(--lime)}
+.mb.show{opacity:1;transform:translateX(calc(-50% + var(--bx,0px))) translateY(0) scale(1)}
+.mb.below{bottom:auto;top:calc(100% + 8px)}
+.mb.below::after{bottom:auto;top:-5px;box-shadow:-2px -2px 0 0 var(--lime)}
+.mb.sum{max-width:230px;white-space:pre-line;text-align:left;font-weight:600;line-height:1.4;padding:9px 13px}
+/* Partículas */
+.mfx{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.mpt{position:absolute;left:50%;top:30%;font:800 1rem/1 var(--sans);opacity:0;animation:mPart 1.15s cubic-bezier(.2,.7,.3,1) forwards;text-shadow:0 1px 2px rgba(var(--sh),.25)}
+@keyframes mPart{0%{opacity:0;transform:translate(-50%,0) scale(.3)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),var(--dy)) scale(1.1) rotate(var(--rt))}}
+@keyframes mBob{50%{transform:translateY(-3px)}}
+@keyframes mShadow{50%{transform:scale(.88);opacity:.7}}
+@keyframes mBreathe{50%{transform:scale(1.03,.96)}}
+@keyframes mBlink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes mBeat{50%{transform:scale(1.22)}}
+@keyframes mSnore{50%{transform:scale(1.5)}}
+@keyframes mJump{0%{transform:scale(1.14,.82)}35%{transform:translateY(-22px) scale(.92,1.1)}65%{transform:translateY(0) scale(1.1,.9)}85%{transform:scale(.97,1.04)}100%{transform:none}}
+@keyframes mLove{0%,100%{transform:rotate(0)}20%{transform:scale(1.12) rotate(-8deg)}45%{transform:scale(1.08) rotate(8deg)}70%{transform:scale(1.12) rotate(-5deg)}}
+@keyframes mTilt{25%{transform:rotate(-12deg) translateY(-4px)}60%{transform:rotate(9deg)}}
+@keyframes mWow{0%{transform:scale(1)}25%{transform:scale(1.2,1.2) translateY(-8px)}40%{transform:scale(1.15) rotate(-4deg)}55%{transform:scale(1.15) rotate(4deg)}100%{transform:none}}
+@keyframes mDance{0%,100%{transform:rotate(-9deg) translateY(0)}50%{transform:rotate(9deg) translateY(-10px)}}
+@keyframes mWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
+@keyframes mSwingL{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-30deg)}}
+@keyframes mSwingR{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(30deg)}}
+@keyframes mLand{0%{transform:scale(1.18,.8)}50%{transform:translateY(-8px) scale(.95,1.06)}100%{transform:none}}
+:root{--lime:var(--olive-light,#a3b52c);--surface:#fff;--head:var(--olive-dark,#2d3516);--sans:'Hanken Grotesk',system-ui,sans-serif;--pop:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.22,1,.36,1);--sh:45,53,22}
+.mascot#cari{z-index:90}
+.mascot.mv{transition:transform .55s var(--pop),opacity .5s}
+.mascot .cq{position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:50%;background:var(--olive);color:#fff;font:800 13px/22px var(--sans);text-align:center;box-shadow:0 0 0 2px #fff;animation:cqp 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes cqp{50%{transform:scale(1.18)}}
+.mascot.mini{position:relative;left:auto;top:auto;width:44px;height:44px;--ms:44px;opacity:1;cursor:default;transform:none!important;z-index:auto}
+.mascot.mini svg{animation:none;filter:none}
+#cPanel{position:fixed;z-index:88;right:18px;bottom:18px;width:min(380px,calc(100vw - 24px));max-height:min(72dvh,620px);display:flex;flex-direction:column;background:#fff;border-radius:24px;box-shadow:0 0 0 1.5px var(--olive-light),0 24px 60px -14px rgba(45,53,22,.45);font-family:'Hanken Grotesk',sans-serif;color:var(--charcoal);opacity:0;visibility:hidden;transform:translateY(24px) scale(.96);transform-origin:90% 100%;transition:opacity .25s,transform .4s var(--pop),visibility .25s;overflow:hidden}
+#cPanel.on{opacity:1;visibility:visible;transform:none}
+@media(max-width:560px){#cPanel{right:10px;left:10px;bottom:10px;width:auto;max-height:68dvh}}
+#cPanel .ch{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 10px;background:linear-gradient(135deg,var(--olive-pale),#fff);border-bottom:1px solid var(--border)}
+#cPanel .ch b{display:block;font:700 15px 'Bodoni Moda',Georgia,serif;color:var(--olive-dark)}
+#cPanel .ch small{font-size:11px;color:var(--charcoal-soft)}
+#cPanel .cx{margin-left:auto;width:32px;height:32px;border:0;border-radius:50%;background:var(--olive-pale);color:var(--olive-dark);font-size:20px;cursor:pointer}
+#cPanel .ca{flex:none;width:44px;height:44px}
+#cPanel .cb{padding:14px 14px 6px;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.45}
+#cPanel .cm{display:flex;gap:8px;align-items:flex-start;animation:cin .4s var(--pop)}
+#cPanel .cm .ca{width:38px;height:38px}
+#cPanel .cm .mascot.mini{width:38px;height:38px}
+#cPanel .ct{background:var(--olive-pale);padding:10px 13px;border-radius:4px 16px 16px 16px}
+@keyframes cin{from{opacity:0;transform:translateY(8px)}}
+#cPanel .cc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#cPanel .cc button,#cPanel .cr button,#cPanel .cf button{font:700 12.5px var(--sans);padding:10px 12px;border:0;border-radius:14px;background:#fff;color:var(--olive-dark);box-shadow:inset 0 0 0 1.5px var(--border);cursor:pointer;text-align:left;display:flex;gap:8px;align-items:center;transition:transform .2s var(--pop),box-shadow .2s}
+#cPanel .cc button:hover,#cPanel .cr button:hover,#cPanel .cf button:hover{box-shadow:inset 0 0 0 2px var(--olive-light);transform:translateY(-1px)}
+#cPanel .cc button:last-child:nth-child(odd){grid-column:1/-1}
+#cPanel .ci{padding:11px 13px;border-radius:14px;box-shadow:inset 0 0 0 1.5px var(--border)}
+#cPanel .ci p{margin:4px 0 0;color:var(--charcoal-soft);font-size:12.5px}
+#cPanel .cr{display:flex;gap:8px;margin-top:8px}
+#cPanel .cr button{justify-content:center;flex:1;background:var(--olive-dark);color:#fff;box-shadow:none;text-align:center}
+#cPanel .cr button+button{background:#fff;color:var(--olive-dark);box-shadow:inset 0 0 0 1.5px var(--border)}
+#cPanel select{width:100%;padding:11px 12px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1.5px var(--border);font:600 13px var(--sans);background:#fff;color:var(--charcoal)}
+#cPanel .cp{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:var(--olive-dark);color:#fff;animation:cin .35s var(--pop)}
+#cPanel .cp span{font:700 20px 'Bodoni Moda',Georgia,serif;color:var(--olive-soft)}
+#cPanel .cn{margin:0;padding:8px 12px;border-radius:12px;background:#fff8e6;color:#6b5516;font-size:12.5px}
+#cPanel .cl{margin:0;padding-left:18px;color:var(--charcoal-soft);font-size:12.5px}
+#cPanel .cl li{margin-bottom:6px}
+#cPanel .cd{border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--border);padding:10px 12px}
+#cPanel .cd summary{font-weight:700;cursor:pointer;font-size:13px}
+#cPanel .cd p{margin:6px 0 0;color:var(--charcoal-soft);font-size:12.5px}
+#cPanel .cf{display:flex;gap:8px;padding:10px 14px 14px}
+#cPanel .cf button{flex:1;justify-content:center}
+</style>
 </head>
 <body>
 
@@ -1286,6 +1389,175 @@ function gElegir(){cerrarGuia();if($('modalEnvio').style.display!=='none')selecc
 document.querySelectorAll('.ship-card').forEach(c=>{const t=+c.dataset.tipo;c.children[1].insertAdjacentHTML('beforeend','<button type="button" class="ship-guide" onclick="event.stopPropagation();abrirGuia('+t+')">▶ Ver guía paso a paso</button>')});
 const _c=continuarEnvio;continuarEnvio=function(){_c();const g=G[tipoEnvioSeleccionado];
  $('guiaInline').innerHTML='<details class="gdet" open><summary>'+g.i+' Guía: cómo registrar tu '+g.n.toLowerCase()+' <span>＋</span></summary><ol>'+g.s.map(x=>'<li><b>'+x[1]+'.</b> '+x[2]+'</li>').join('')+'</ol><button type="button" class="ship-guide" onclick="abrirGuia('+tipoEnvioSeleccionado+')">▶ Ver el video guía</button></details>'};
+</script>
+<script id="cariJs">
+/* ===== Cari: asistente de envíos ===== */
+(function(){
+const INF='M0 0C3-5 9-5 9 0S3 5 0 0-9-5-9 0-3 5 0 0Z';
+function svgFor(h){
+const c=h?{ink:'#0d0f12',line:'#c8e23a',mf:'#0d0f12',ms:'#c8e23a',fy:60,sh:'#000'}:{ink:'#2d3516',line:'#2d3516',mf:'#2d3516',ms:'#2d3516',fy:70,sh:'#2d3516'};
+const eyeO=x=>'<circle cx="'+x+'" cy="0" r="5.4" fill="#fff"/><circle cx="'+(x+.6)+'" cy=".6" r="3.1" fill="'+c.ink+'"/><circle cx="'+(x+1.7)+'" cy="-.7" r="1.1" fill="#fff"/>';
+const eyeW=x=>'<circle cx="'+x+'" cy="0" r="6.3" fill="#fff" stroke="'+c.ink+'" stroke-width="1.2"/><circle cx="'+x+'" cy="0" r="2.4" fill="'+c.ink+'"/><circle cx="'+(x+1)+'" cy="-1" r=".9" fill="#fff"/>';
+const arc=(x,d)=>'<path d="M'+(x-5.5)+' '+(d?-1:2.5)+'Q'+x+' '+(d?4:-5)+' '+(x+5.5)+' '+(d?-1:2.5)+'" stroke="'+c.line+'" stroke-width="3" fill="none"/>';
+const heart=x=>'<g transform="translate('+x+' 0)"><path class="hb" d="M0 3.5C-7-1.5-5-8-2.2-8C-.8-8 0-7 0-6C0-7 .8-8 2.2-8C5-8 7-1.5 0 3.5Z" fill="#ff5f87"/></g>';
+const big='<path d="M43 7Q50 21 57 7Z" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width="1" fill-opacity="1"/><ellipse cx="50" cy="12" rx="3" ry="1.9" fill="#ff7f9d"/>';
+const cat='<path d="M43.5 7.5Q46.8 13 50 7.5Q53.2 13 56.5 7.5" stroke="'+c.line+'" stroke-width="2.4" fill="none"/>';
+const face='<g transform="translate(0 '+c.fy+')">'+
+'<ellipse cx="27" cy="7" rx="5" ry="3" fill="#ff8fab" opacity=".6"/><ellipse cx="73" cy="7" rx="5" ry="3" fill="#ff8fab" opacity=".6"/>'+
+'<g class="p k-idle"><g class="blink">'+eyeO(36)+eyeO(64)+'</g><path d="M44.5 8Q50 13.5 55.5 8" stroke="'+c.line+'" stroke-width="2.4" fill="none"/></g>'+
+'<g class="p k-happy k-dance">'+arc(36)+arc(64)+big+'</g>'+
+'<g class="p k-love">'+heart(36)+heart(64)+cat+'</g>'+
+'<g class="p k-wow">'+eyeW(36)+eyeW(64)+'<ellipse cx="50" cy="10.5" rx="3.2" ry="4.2" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width="1"/></g>'+
+'<g class="p k-wink">'+eyeO(36)+arc(64)+cat+'</g>'+
+'<g class="p k-sleep">'+arc(36,1)+arc(64,1)+'<ellipse class="snore" cx="50" cy="10" rx="2.2" ry="1.7" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width=".8"/></g>'+
+'</g>';
+const emb=(x,y,s,col,w)=>'<path d="'+INF+'" transform="translate('+x+' '+y+') scale('+s+')" stroke="'+col+'" stroke-width="'+w+'" fill="none"/>';
+const shadow='<ellipse class="sh" cx="50" cy="96" rx="26" ry="3.6" fill="'+c.sh+'" opacity="'+(h?'.45':'.2')+'"/>';
+if(h){
+return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="mgW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a414c"/><stop offset="1" stop-color="#1d2128"/></linearGradient></defs>'+shadow+
+'<g transform="rotate(-9 62 28)"><rect x="46" y="10" width="36" height="30" rx="5" fill="#c8e23a"/><rect x="50" y="14" width="28" height="22" rx="3" stroke="#0d0f12" stroke-width="1.2" fill="none" opacity=".45"/>'+emb(64,25,.9,'#0d0f12',1.6)+'</g>'+
+'<ellipse cx="34" cy="90" rx="9" ry="4.5" fill="#1d2128" stroke="#c8e23a" stroke-width="1.2"/><ellipse cx="66" cy="90" rx="9" ry="4.5" fill="#1d2128" stroke="#c8e23a" stroke-width="1.2"/>'+
+'<rect x="12" y="30" width="76" height="58" rx="14" fill="url(#mgW)" stroke="#c8e23a" stroke-width="1.6"/>'+
+'<rect x="18" y="36" width="64" height="46" rx="9" stroke="#c8e23a" stroke-width="1.3" stroke-dasharray="3.5 3" fill="none" opacity=".85"/>'+
+emb(50,44,.7,'#c8e23a',2.2)+face+
+'<g transform="rotate(10 10 62)"><ellipse class="arm arm-l" cx="10" cy="62" rx="5.5" ry="9" fill="#2a3039" stroke="#c8e23a" stroke-width="1.4"/></g>'+
+'<g transform="rotate(-10 90 62)"><ellipse class="arm arm-r" cx="90" cy="62" rx="5.5" ry="9" fill="#2a3039" stroke="#c8e23a" stroke-width="1.4"/></g></svg>'}
+return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="mgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcd13a"/><stop offset="1" stop-color="#8aa02a"/></linearGradient><linearGradient id="mgF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbe872"/><stop offset="1" stop-color="#a3b52c"/></linearGradient></defs>'+shadow+
+'<path d="M33 40C29 6 71 6 67 40" stroke="#657c1c" stroke-width="6" fill="none"/>'+
+'<ellipse cx="34" cy="92" rx="9" ry="4.6" fill="#657c1c"/><ellipse cx="66" cy="92" rx="9" ry="4.6" fill="#657c1c"/>'+
+'<path d="M16 40Q16 35 22 35H78Q84 35 84 40L88 80Q89 91 78 91H22Q11 91 12 80Z" fill="url(#mgB)"/>'+
+'<path d="M16 40Q16 35 22 35H78Q84 35 84 40L82 48Q50 62 18 48Z" fill="url(#mgF)"/>'+
+'<path d="M23 42Q50 55 77 42" stroke="#f3f5e6" stroke-width="1.4" stroke-dasharray="3 3" fill="none" opacity=".85"/>'+
+'<circle cx="50" cy="55" r="6.5" fill="#c9a24b" stroke="#f3f5e6" stroke-width="1.2"/>'+emb(50,55,.55,'#fff',2.4)+face+
+'<g transform="rotate(12 10 68)"><ellipse class="arm arm-l" cx="10" cy="68" rx="5.5" ry="9" fill="#8aa02a"/></g>'+
+'<g transform="rotate(-12 90 68)"><ellipse class="arm arm-r" cx="90" cy="68" rx="5.5" ry="9" fill="#8aa02a"/></g></svg>'}
+const GL={happy:['✦','★','∞'],love:['♥','♥','✦'],wink:['★','✦'],wow:['!','✦','!'],dance:['♪','♫','✦'],sleep:['z','Z','z']};
+const DUR={happy:1900,love:2500,wink:1900,wow:1900,dance:3100};
+const $=id=>document.getElementById(id);
+const W=()=>document.documentElement.clientWidth,H=()=>innerHeight;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='il-cari-pos';
+const MINI='<div class="mascot mini on" data-mood="happy"><div class="rig">'+svgFor(false)+'</div></div>';
+const INFO={
+1:{i:'🏠',n:'Recojo en tienda',t:'Pasas por nuestro <b>taller</b> a retirar tu pedido. Eliges la fecha y una franja: <b>10:00–12:00</b> o <b>5:00–7:00 pm</b>. Te avisamos <b>1 hora antes</b>.'},
+2:{i:'🛵',n:'Envío motorizado',t:'Courier en <b>Lima y Callao</b> con fecha programada. Antes de las <b>8:00 am</b> puedes elegir hoy; después, desde mañana. El costo depende de tu distrito.'},
+3:{i:'📦',n:'Envío Shalom',t:'Entrega a <b>nivel nacional</b> vía agencia Shalom, por vía <b>terrestre o aérea</b>. Eliges el punto de entrega y Shalom pide tu DNI o carnet.'},
+4:{i:'⚡',n:'Envío Express',t:'Entrega <b>el mismo día</b>, solo en <b>Lima y Callao</b>, sujeta a horario y disponibilidad.'}};
+const TIPS={dni:'Escribe tu DNI o carnet de extranjería. Con DNI, tu nombre se completa solo ✨',nombres:'Tu nombre completo, tal como figura en tu documento 📝',telefono:'Tu número de WhatsApp: por ahí te escribiremos 💚',departamento:'Elige tu departamento para ver las opciones 🧭',provincia:'Ahora tu provincia 📍',zona:'Elige tu zona o distrito ✨',lugarEntrega:'Elige la agencia Shalom donde recogerás tu pedido 🏢',direccion:'Calle, número e interior. ¡Mientras más claro, mejor llega! 🏡',referencia:'Una referencia ayuda mucho al courier: portón, parque cercano… 🛵',ubicacionMaps:'Opcional: pega el enlace de tu ubicación de Google Maps 🗺️',fechaRecojo:'¿Qué día pasarás por el taller? No puede ser antes de hoy 📅',fechaMotorizado:'Antes de las 8:00 am puedes elegir hoy; después, desde mañana 📅',fechaExpress:'Elige la fecha de entrega express, desde hoy ⚡',fechaShalom:'¿Qué día enviamos tu paquete? 📦'};
+const IDLE=['¿Dudas con tu envío? Tócame y te ayudo 💬','Con tu DNI se completa tu nombre solo ✨','¡Tu pedido va a quedar precioso! 💚','Tip: antes de enviar, revisa bien tus datos 👀','Puedo decirte cuánto cuesta el envío a tu distrito 🛵','Tócame para ver horarios, costos y agencias 📦','Cada detalle cuenta: ¡qué buena elección! ✨'];
+let root,bub,fx,panel,body,S,helloDone=false;
+function modalOn(){const m=$('modalEnvio');return m&&getComputedStyle(m).display!=='none'}
+function build(){
+root=document.createElement('div');root.id='cari';root.className='mascot';root.tabIndex=0;root.setAttribute('role','button');root.setAttribute('aria-label','Cari, tu asistente de envíos: tócala para ver opciones');
+root.dataset.mood='idle';root.dataset.anim='';
+root.innerHTML='<div class="rig">'+svgFor(false)+'</div><div class="mfx"></div><div class="mb" role="status"></div><span class="cq" id="cQ">?</span>';
+document.body.appendChild(root);bub=root.querySelector('.mb');fx=root.querySelector('.mfx');
+panel=document.createElement('div');panel.id='cPanel';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Asistente Cari');
+panel.innerHTML='<div class="ch"><div class="ca">'+MINI+'</div><div><b>Cari</b><small>Asistente de envíos de Infinity Leather</small></div><button class="cx" aria-label="Cerrar" data-a="close">×</button></div><div class="cb" id="cBody"></div><div class="cf"><button data-go="menu">← Menú</button><button data-a="wa">💬 Hablar con Rut</button></div>';
+document.body.appendChild(panel);body=$('cBody')}
+function setup(){
+build();
+S={x:0,y:0,fx:1,fy:.82,sleeping:false,drag:false,act:Date.now(),lastIdle:0,lastMsg:'',view:'menu',open:false,saved:null,lastTip:'',lastTipT:0,sh:{d:'',p:'',z:''}};
+const SZ=()=>root.offsetWidth||72;
+try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&isFinite(v.fx)&&isFinite(v.fy)){S.fx=v.fx;S.fy=v.fy}}catch(e){}
+const apply=()=>{root.style.transform='translate3d('+S.x+'px,'+S.y+'px,0)'};
+const clamp=()=>{const s=SZ();S.x=Math.min(Math.max(4,S.x),Math.max(4,W()-s-4));S.y=Math.min(Math.max(4,S.y),Math.max(4,H()-s-4))};
+const fromFrac=()=>{const s=SZ();S.x=4+S.fx*Math.max(0,W()-s-8);S.y=4+S.fy*Math.max(0,H()-s-8);clamp();apply()};
+const save=()=>{const s=SZ();S.fx=(S.x-4)/Math.max(1,W()-s-8);S.fy=(S.y-4)/Math.max(1,H()-s-8);try{localStorage.setItem(KEY,JSON.stringify({fx:S.fx,fy:S.fy}))}catch(e){}};
+const mood=m=>{root.dataset.mood=m};
+const anim=a=>{root.dataset.anim='';void root.offsetWidth;root.dataset.anim=a};
+let tBub=0,tRev=0,iZ=0,tSleep=0;
+function say(t,ms){clearTimeout(tBub);bub.textContent=t;bub.classList.toggle('below',S.y<90);bub.style.setProperty('--bx','0px');
+const bw=bub.offsetWidth,c=S.x+SZ()/2,l=c-bw/2;let bx=0;if(l<8)bx=8-l;else if(l+bw>W()-8)bx=W()-8-(l+bw);bub.style.setProperty('--bx',bx+'px');
+bub.classList.add('show');tBub=setTimeout(()=>bub.classList.remove('show'),ms||3200)}
+function burst(m,n){const cols=['#a3b52c','#657c1c','#c9a24b','#8aa02a'],gl=GL[m]||GL.happy,up=S.y>=70;
+for(let i=0;i<n;i++){const s=document.createElement('span'),g=gl[i%gl.length];s.className='mpt';s.textContent=g;s.style.color=g==='♥'?'#ff5f87':pick(cols);
+s.style.setProperty('--dx',((Math.random()*2-1)*38)+'px');s.style.setProperty('--dy',((up?-1:1)*(28+Math.random()*34))+'px');s.style.setProperty('--rt',((Math.random()*2-1)*40)+'deg');
+s.style.left=(30+Math.random()*40)+'%';s.style.top=up?'30%':'70%';s.style.animationDelay=(i*60)+'ms';s.style.fontSize=(.8+Math.random()*.6)+'rem';fx.appendChild(s);setTimeout(()=>s.remove(),1700+i*60)}}
+function react(m,text,ms){clearTimeout(tRev);mood(m);anim(m);if(text)say(text,ms);burst(m,m==='dance'?8:5);
+tRev=setTimeout(()=>{if(!S.sleeping&&!S.drag){mood('idle');root.dataset.anim=''}},DUR[m]||1900)}
+const sleepTimer=()=>{clearTimeout(tSleep);tSleep=setTimeout(goSleep,55000)};
+function goSleep(){if(S.drag||S.open)return;S.sleeping=true;clearTimeout(tRev);mood('sleep');root.dataset.anim='';say('Zzz…',1800);burst('sleep',2);clearInterval(iZ);iZ=setInterval(()=>burst('sleep',2),2600)}
+function wake(){clearInterval(iZ);if(S.sleeping){S.sleeping=false;mood('idle')}sleepTimer()}
+const tip=(t,m)=>{if(S.open||S.drag)return;S.sleeping&&wake();react(m||'happy',t,4200)};
+window.cariSay=tip;
+/* ---------- Panel ---------- */
+const bubble=h=>'<div class="cm"><div class="ca">'+MINI+'</div><div class="ct">'+h+'</div></div>';
+const chips=l=>'<div class="cc">'+l.map(x=>'<button data-go="'+x[2]+'"><span>'+x[0]+'</span>'+x[1]+'</button>').join('')+'</div>';
+const price=d=>d.precio==null?'Consultar precio':'S/ '+d.precio.toFixed(2);
+const sortK=o=>Object.keys(o).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+const opts=(arr,sel,ph)=>'<option value="" disabled'+(sel?'':' selected')+'>'+ph+'</option>'+arr.map(k=>'<option value="'+esc(k)+'"'+(k===sel?' selected':'')+'>'+esc(k)+'</option>').join('');
+const VIEWS={
+menu:()=>bubble('¡Hola! Soy <b>Cari</b> 💚 Estoy aquí para ayudarte con tu envío. ¿Qué necesitas?')+chips([['📦','Tipos de envío','tipos'],['💰','Costo a mi distrito','costo'],['⏰','Horarios y plazos','horarios'],['🏢','Agencias Shalom','shalom'],['📝','Ayuda con mi formulario','form'],['▶','Guías paso a paso','guias'],['❓','Preguntas frecuentes','faq']]),
+tipos:()=>bubble('Tenemos <b>4 formas</b> de recibir tu pedido:')+[1,2,3,4].map(t=>'<div class="ci"><b>'+INFO[t].i+' '+INFO[t].n+'</b><p>'+INFO[t].t+'</p><div class="cr"><button data-a="pick" data-t="'+t+'">Elegir este</button><button data-a="guia" data-t="'+t+'">▶ Guía</button></div></div>').join(''),
+costo:()=>bubble('El <b>envío motorizado</b> (Lima y Callao) depende de tu distrito. Elige el tuyo y te digo el costo 🛵')+'<select data-sel="costo">'+'<option value="" disabled selected>Selecciona tu distrito</option>'+[...preciosMotorizado].sort((a,b)=>a.distrito.localeCompare(b.distrito,'es',{sensitivity:'base'})).map(d=>'<option value="'+esc(d.distrito)+'">'+esc(d.distrito)+'</option>').join('')+'</select><div id="cOut"></div>',
+horarios:()=>bubble('Estos son los <b>horarios y plazos</b> de cada envío ⏰')+'<div class="ci"><b>🏠 Recojo en tienda</b><p>Franjas: 10:00–12:00 y 5:00–7:00 pm. Te avisamos 1 hora antes. La fecha no puede ser anterior a hoy.</p></div><div class="ci"><b>🛵 Motorizado</b><p>Antes de las 8:00 am puedes elegir hoy; después, solo fechas posteriores a hoy.</p></div><div class="ci"><b>⚡ Express</b><p>Mismo día en Lima y Callao, sujeto a horario y disponibilidad.</p></div><div class="ci"><b>📦 Shalom</b><p>Terrestre o aéreo, tú eliges la fecha de envío. Los tiempos de llegada los define Shalom.</p></div><p class="cn">¿Otra duda de plazos? Escríbele a Rut por WhatsApp 💬</p>',
+shalom:()=>{const d=S.sh.d,p=S.sh.p,z=S.sh.z;let h=bubble('Busca la <b>agencia Shalom</b> más cercana a ti 🏢');
+h+='<select data-sel="sd">'+opts(sortK(shalomData),d,'Departamento')+'</select>';
+if(d)h+='<select data-sel="sp">'+opts(sortK(shalomData[d]),p,'Provincia')+'</select>';
+if(d&&p)h+='<select data-sel="sz">'+opts(sortK(shalomData[d][p]),z,'Distrito / zona')+'</select>';
+if(d&&p&&z){const l=shalomData[d][p][z]||[];h+='<p class="cn">'+l.length+' agencia'+(l.length===1?'':'s')+' disponible'+(l.length===1?'':'s')+':</p>'+l.slice(0,8).map(a=>'<div class="ci"><b>📍 '+esc(String(a.nombre).split(' / ').pop())+'</b><p>'+esc(a.direccion)+'<br>📞 '+esc(a.telefono)+'</p></div>').join('')}
+return h},
+form:()=>{const t=tipoEnvioSeleccionado;if(!t)return bubble('Primero elige <b>cómo quieres recibir</b> tu pedido y te guío campo por campo 💚')+chips([['📦','Ver tipos de envío','tipos']]);
+return bubble('Para tu <b>'+INFO[t].n.toLowerCase()+'</b> haz esto:')+'<ol class="cl">'+G[t].s.map(x=>'<li><b>'+x[1]+'.</b> '+x[2]+'</li>').join('')+'</ol><div class="cr"><button data-a="guia" data-t="'+t+'">▶ Ver video guía</button></div>'},
+guias:()=>bubble('Mira la <b>guía paso a paso</b> del envío que te interesa ▶')+chips([['🏠','Recojo en tienda','g1'],['🛵','Motorizado','g2'],['📦','Shalom','g3'],['⚡','Express','g4']]),
+faq:()=>bubble('Las dudas más comunes ❓')+[['¿Puedo corregir mis datos?','Sí. En la pantalla final, antes de enviar, usa el botón <b>Modificar datos</b>.'],['¿Cómo envío mi pedido?','Pulsa <b>Confirmar pedido</b> y luego <b>Enviar pedido</b>: se abre WhatsApp con tu resumen listo.'],['No tengo DNI, ¿qué hago?','Usa tu carnet de extranjería y escribe tu nombre completo a mano.'],['¿El DNI es obligatorio en motorizado?','En motorizado es opcional. Si lo escribes, tu nombre se completa solo.'],['¿Dónde hay Express y motorizado?','Solo en Lima y Callao. Para provincias usa Shalom.']].map(q=>'<details class="cd"><summary>'+q[0]+'</summary><p>'+q[1]+'</p></details>').join('')};
+function go(v){S.view=v;body.innerHTML=(VIEWS[v]||VIEWS.menu)();body.scrollTop=0}
+function dock(){const r=panel.getBoundingClientRect(),s=SZ();S.saved={x:S.x,y:S.y};root.classList.add('mv');
+S.x=Math.min(W()-s-8,r.right-s-4);S.y=r.top-s-2;if(S.y<4){S.x=Math.max(4,r.left-s-6);S.y=Math.max(4,H()-s-12)}clamp();apply();setTimeout(()=>root.classList.remove('mv'),600)}
+function openP(v){S.open=true;wake();bub.classList.remove('show');go(v||'menu');panel.classList.add('on');root.classList.add('opened');$('cQ').style.display='none';requestAnimationFrame(dock);react('happy')}
+function closeP(){if(!S.open)return;S.open=false;panel.classList.remove('on');if(S.saved){root.classList.add('mv');S.x=S.saved.x;S.y=S.saved.y;clamp();apply();setTimeout(()=>root.classList.remove('mv'),600);S.saved=null}}
+window.cariOpen=openP;window.cariClose=closeP;
+panel.addEventListener('click',e=>{const b=e.target.closest('[data-go],[data-a]');if(!b)return;
+if(b.dataset.go){const g=b.dataset.go;if(/^g[1-4]$/.test(g)){abrirGuia(+g[1]);return}go(g);return}
+const a=b.dataset.a,t=+b.dataset.t;
+if(a==='close')closeP();
+else if(a==='wa')window.open('https://wa.me/'+WHATSAPP_DESTINO+'?text='+encodeURIComponent('Hola Rut, tengo una consulta sobre mi envío 💚'),'_blank');
+else if(a==='guia')abrirGuia(t);
+else if(a==='pick'){if(modalOn()){seleccionarEnvio(t);closeP();react('love','¡Buena elección! Pulsa Continuar 💚',3600)}else{body.insertAdjacentHTML('afterbegin','<div class="cn">Para cambiar el tipo de envío usa el botón <b>← Cambiar tipo de envío</b> del formulario.</div>')}}});
+panel.addEventListener('change',e=>{const s=e.target.dataset.sel;if(!s)return;const v=e.target.value;
+if(s==='costo'){const d=preciosMotorizado.find(x=>x.distrito===v);$('cOut').innerHTML=d?'<div class="cp">Envío a <b>'+esc(d.distrito)+'</b><span>'+price(d)+'</span></div>'+(d.precio==null?'<p class="cn">Escríbele a Rut por WhatsApp para confirmar el precio 💬</p>':''):'';if(d)react('happy')}
+else{if(s==='sd'){S.sh={d:v,p:'',z:''}}else if(s==='sp'){S.sh.p=v;S.sh.z=''}else S.sh.z=v;const y=body.scrollTop;body.innerHTML=VIEWS.shalom();body.scrollTop=y}});
+/* ---------- Interacción ---------- */
+let down=false,moved=false,sx=0,sy=0,ox=0,oy=0,pid=0;
+root.addEventListener('pointerdown',e=>{if(e.button>0)return;down=true;moved=false;sx=e.clientX;sy=e.clientY;ox=S.x;oy=S.y;pid=e.pointerId;try{root.setPointerCapture(pid)}catch(_){}});
+root.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-sx,dy=e.clientY-sy;
+if(!moved&&Math.hypot(dx,dy)>6){moved=true;S.drag=true;wake();clearTimeout(tRev);root.classList.add('drag');root.dataset.anim='';mood('happy');bub.classList.remove('show')}
+if(moved){S.x=ox+dx;S.y=oy+dy;clamp();apply()}});
+function up(e){if(!down)return;down=false;try{root.releasePointerCapture(pid)}catch(_){}
+if(moved){S.drag=false;root.classList.remove('drag');mood('idle');anim('land');save();burst('happy',3)}
+else if(e.type==='pointerup'){if(S.open)closeP();else openP()}}
+root.addEventListener('pointerup',up);root.addEventListener('pointercancel',up);
+root.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();S.open?closeP():openP();return}
+if(e.key==='Escape')closeP();const d={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key];if(d){e.preventDefault();S.x+=d[0];S.y+=d[1];clamp();apply();save()}});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
+addEventListener('resize',()=>{fromFrac();if(S.open)dock()});
+const act=()=>{S.act=Date.now();if(S.sleeping)wake();else sleepTimer()};
+['pointerdown','keydown','touchstart','wheel','scroll'].forEach(ev=>addEventListener(ev,act,{passive:true}));
+setInterval(()=>{const n=Date.now();if(S.sleeping||S.drag||S.open||down||n-S.act<9000||n-S.lastIdle<11000||bub.classList.contains('show'))return;
+S.lastIdle=n;let t;do{t=pick(IDLE)}while(t===S.lastMsg);S.lastMsg=t;react(pick(['happy','love','wink','dance']),t,3800)},1000);
+setInterval(()=>{if(root.dataset.mood==='idle'&&!S.drag&&!S.sleeping&&Math.random()<.6){mood('wink');setTimeout(()=>{if(root.dataset.mood==='wink'&&!S.drag&&!S.sleeping)mood('idle')},1100)}},15000);
+/* ---------- Contexto de la página ---------- */
+document.addEventListener('focusin',e=>{const id=e.target&&e.target.id,t=TIPS[id];if(!t)return;const n=Date.now();if(id===S.lastTip&&n-S.lastTipT<20000)return;S.lastTip=id;S.lastTipT=n;tip(t,'wink')});
+$('zona').addEventListener('change',()=>{if(tipoEnvioSeleccionado!==2)return;const d=preciosMotorizado.find(x=>x.distrito===$('zona').value);if(d)tip(d.precio==null?'Ese distrito requiere consultar el precio. Escríbele a Rut 💬':'Envío a '+d.distrito+': '+price(d)+' 🛵','wow')});
+$('lugarEntrega').addEventListener('change',()=>tip('¡Perfecto! Recogerás tu pedido en esa agencia 📦','love'));
+const hook=(n,f)=>{const o=window[n];if(typeof o!=='function')return;window[n]=function(){const r=o.apply(this,arguments);try{f.apply(this,arguments)}catch(e){}return r}};
+hook('seleccionarEnvio',t=>{const i=INFO[t];if(i)tip(i.i+' '+i.n+': '+i.t.replace(/<[^>]+>/g,''),'love')});
+hook('continuarEnvio',()=>{const i=INFO[tipoEnvioSeleccionado];if(i)tip('¡Vamos! Completa tus datos para tu '+i.n.toLowerCase()+'. Si te pierdes, tócame 💚','happy')});
+hook('volverAtras',()=>tip('Sin problema, elige otra forma de recibir tu pedido 💚','wink'));
+hook('confirmarPedido',()=>setTimeout(()=>{if(!$('panelGracias').hidden){closeP();react('dance','¡Pedido registrado! 🎉 Revisa el resumen y pulsa Enviar pedido',5000)}else if(!$('panelFormulario').hidden)tip('Revisa los campos marcados en rojo 🙈 Te falta algo','wow')},700));
+hook('volverAEditar',()=>tip('Corrige lo que necesites y confirma otra vez ✍️','wink'));
+hook('enviarPedidoWhatsApp',()=>tip('¡Listo! Se abrió WhatsApp con tu pedido 💚 ¡Gracias por elegirnos!','love'));
+hook('abrirGuia',()=>{closeP();bub.classList.remove('show')});
+fromFrac();requestAnimationFrame(()=>root.classList.add('on'));sleepTimer();
+if(!helloDone){helloDone=true;setTimeout(()=>{if(S.open||S.drag)return;mood('dance');anim('dance');say('¡¡HOLAAA!! 🎉 ¡Soy Cari y qué emoción verte por aquí!',3400);burst('dance',14);if(navigator.vibrate)try{navigator.vibrate([20,40,20])}catch(e){}
+setTimeout(()=>{if(!S.open&&!S.drag){mood('wow');anim('wow');burst('happy',8)}},1700);
+setTimeout(()=>{if(!S.open&&!S.drag){mood('happy');anim('happy');say(modalOn()?'¿Cómo quieres recibir tu pedido? Tócame si tienes dudas 💚':'Tócame si necesitas ayuda con tu envío 💚',4200);burst('love',8)}},3600);
+setTimeout(()=>{if(!S.open&&!S.drag)mood('idle')},5800)},1000)}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
 </script>
 </body>
 </html>

@@ -365,6 +365,41 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
 @keyframes mCurious{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg) translateY(-2px)}}
 @keyframes mPeek{40%{transform:translateY(-7px) rotate(7deg) scale(1.06)}}
 </style>
+<style id="compacto">
+@media(max-width:600px){
+.page{padding:12px 12px 56px}.stitch-frame{inset:6px;border-radius:18px}
+.brand{margin-bottom:12px}.brand-logo{height:68px}.brand-tag{margin-top:6px;padding:4px 12px;font-size:10px}
+.card,.modal-card{border-radius:18px}.card{padding:16px 14px}#panelFormulario .card{padding:14px 12px}
+#panelFormulario .card>div[style*="inline-flex"]{padding:6px 12px!important;font-size:10.5px!important;margin-bottom:8px!important;gap:6px!important}
+h2{font-size:21px;margin-bottom:3px}.subtitle{font-size:12.5px;line-height:1.4;margin-bottom:10px}
+.form-grid{gap:9px}.form-group label{font-size:10px;margin-bottom:3px}
+.form-group input,.form-group select,.form-group textarea{font-size:16px;padding:8px 11px;border-radius:9px}
+.form-group select{background-position:right 11px center}.form-group textarea{min-height:46px}
+.field-error{font-size:11px;margin-top:3px}.hint{font-size:11px}
+.btn{font-size:13px;padding:10px 16px}.actions{margin-top:12px;gap:8px}
+.modal-overlay{padding:10px}.modal-card{padding:14px 12px;max-height:94vh}
+.modal-head{margin-bottom:10px}.modal-head h1{font-size:18px}.modal-head p{font-size:12px;margin-top:3px}.modal-head div[style]{font-size:22px!important;margin-bottom:0!important}
+.ship-options{gap:8px}.ship-card{padding:10px 42px 10px 10px;gap:10px;border-radius:13px}
+.ship-icon{width:34px;height:34px;font-size:16px}.ship-name{font-size:13px}.ship-desc{font-size:11px;line-height:1.35}
+.ship-check{right:10px;top:12px;width:19px;height:19px;font-size:11px}.ship-guide{margin-top:5px;padding:4px 10px;font-size:10.5px}
+#btnContinuar{margin-top:12px!important}
+.radio-group{gap:8px}.radio-option{min-width:120px;padding:8px 10px;font-size:12.5px}
+.notice-box,.alert-box{padding:9px 11px;font-size:11.5px;margin-top:8px}.alert-box{margin-bottom:12px}
+.price-badge{padding:5px 12px;font-size:12px}.price-badge .amount{font-size:14px}
+.thanks-title{font-size:32px;margin:2px 0 8px}.thanks-ribbon{font-size:10.5px;padding:7px 14px;margin-bottom:12px}
+.thanks-summary{padding:11px 13px;gap:6px;margin-bottom:12px}.thanks-summary .row{font-size:12.5px;padding-bottom:5px}.thanks-copy{font-size:12.5px;margin-bottom:12px;line-height:1.5}
+.gdet{margin-bottom:12px}.gdet summary{padding:9px 12px;font-size:12.5px}.gdet ol{padding:0 12px 10px 28px;font-size:12px}.gdet button{margin:0 12px 12px}
+.bienvenida{padding:9px 30px 9px 10px;gap:9px;border-radius:14px}.bv-av{width:36px;height:36px;font-size:16px;box-shadow:0 0 0 3px #fff,0 0 0 4px var(--olive-soft)}
+.bv-txt small{font-size:9.5px}.bv-txt b{font-size:16px;margin:1px 0 2px}.bv-txt p{font-size:11.5px;margin-bottom:5px;line-height:1.35}.bv-badge{font-size:9.5px;padding:3px 9px}.bv-x{top:4px;right:6px;width:24px;height:24px;font-size:17px}
+.dni-estado{font-size:11px;margin-top:4px}
+.stage{min-height:300px;padding:16px}.scene{gap:10px}.scene h3{font-size:23px}.bigi{font-size:32px}.mock{padding:9px 12px}.cap{font-size:12px;padding:9px 11px}.side{padding:14px}.side h4{font-size:21px}.st{padding:7px 9px;font-size:12.5px}
+.mascot#cari{--ms:58px}.mb{font-size:.68rem;padding:6px 9px}
+#cPanel .cb{padding:10px 10px 4px;gap:8px;font-size:12.5px}#cPanel .ch{padding:8px 10px}#cPanel .ch b{font-size:14px}#cPanel .ch small{font-size:10px}
+#cPanel .ca,#cPanel .cm .ca,#cPanel .cm .mascot.mini{width:32px;height:32px}.ct{padding:8px 10px}
+#cPanel .cc button,#cPanel .cr button,#cPanel .cf button{font-size:11.5px;padding:8px 10px}#cPanel .ci{padding:8px 10px}#cPanel .ci p{font-size:11.5px}#cPanel .cf{padding:8px 10px 10px}
+#cPanel{max-height:62dvh}
+}
+</style>
 </head>
 <body>
 
@@ -854,7 +889,7 @@ function continuarEnvio(){
   const config={
     1:{icono:'🏠',titulo:'Recojo en tienda',sub:'Completa tus datos y programa tu visita al taller.',depto:'LIMA',prov:'LIMA',zona:'recojo_fijo',fechaRecojo:true,horarioRecojo:true,fechaM:false,fechaE:false,fechaShalom:false,maps:false,direccion:false,referencia:false,precioM:false,lugarEntrega:false},
     2:{icono:'🛵',titulo:'Envío motorizado (courier)',sub:'Selecciona tu distrito para ver el costo de envío y programa la fecha. La entrega es de 12:00 pm a 7:00 pm, sin horario fijo.',depto:'LIMA',prov:'LIMA',zona:'distrito_motorizado',fechaRecojo:false,horarioRecojo:false,fechaM:true,fechaE:false,fechaShalom:false,maps:true,direccion:true,referencia:true,precioM:true,lugarEntrega:false},
-    3:{icono:'📦',titulo:'Envío Shalom',sub:'Selecciona departamento, provincia y zona de entrega nacional.',depto:'shalom',prov:'shalom',zona:'shalom',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:false,fechaShalom:true,tipoTransporte:true,maps:false,direccion:true,referencia:false,precioM:false,lugarEntrega:true},
+    3:{icono:'📦',titulo:'Envío Shalom',sub:'Selecciona departamento, provincia y zona de entrega nacional.',depto:'shalom',prov:'shalom',zona:'shalom',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:false,fechaShalom:true,tipoTransporte:true,maps:false,direccion:false,referencia:false,precioM:false,lugarEntrega:true},
     4:{icono:'⚡',titulo:'Envío Express',sub:'Entrega el mismo día (sujeta a horario y disponibilidad). Es previo pago del total del pedido; el costo de envío se paga al motorizado cuando llegue.',depto:'LIMA',prov:'LIMA',zona:'distrito_lima',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:true,fechaShalom:false,maps:false,direccion:true,referencia:false,precioM:false,lugarEntrega:false}
   };
   const c=config[tipoEnvioSeleccionado];
@@ -1137,7 +1172,7 @@ function confirmarPedido(){
     nombres, dni, telefono, departamento, provincia, zonaText,
     lugarEntregaText: (!document.getElementById('grupoLugarEntrega').hidden)?lugarEntregaText:'',
     tipoTransporteShalom: (!document.getElementById('grupoTipoTransporteShalom').hidden)?(tipoTransporteShalom==='aereo'?'Aéreo':'Terrestre'):'',
-    direccion: (!document.getElementById('grupoDireccion').hidden)?direccion:'',
+    direccion: (!document.getElementById('grupoDireccion').hidden||tipoEnvioSeleccionado===3)?direccion:'',
     referencia: (!document.getElementById('grupoReferencia').hidden)?referencia:'',
     ubicacionMaps: (!document.getElementById('grupoMaps').hidden)?ubicacionMaps:'',
     fecha, horario, precioTexto
@@ -1330,6 +1365,11 @@ function guardarCliente(p){
   });
   nomEl.addEventListener('input',()=>{auto.nombres=false;});
   telEl.addEventListener('input',()=>{auto.telefono=false;});
+  function ocultarAvisos(e){const t=e.target;if(!t||t===dniEl||!t.closest||t.closest('#cPanel')||card.contains(t))return;
+    const nuevo=estado.classList.contains('nuevo');if(card.hidden&&!nuevo)return;ocultarBienvenida();if(nuevo)setEstado('');}
+  document.addEventListener('focusin',e=>{const t=e.target;if(/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))ocultarAvisos(e);});
+  document.addEventListener('change',ocultarAvisos);
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.radio-option,.ship-card,.btn'))ocultarAvisos(e);});
 })();
 </script>
 
@@ -1362,7 +1402,6 @@ const G={
  ['🧭','Destino','Elige departamento, provincia y zona de entrega nacional.','Departamento','Arequipa'],
  ['🏢','Punto Shalom','Selecciona la agencia donde recogerás tu pedido.','Punto de entrega','Agencia Centro'],
  ['✈️','Terrestre o aéreo','Escoge cómo viajará tu paquete y la fecha de envío.','Tipo de envío','Terrestre'],
- ['🏡','Dirección','Completa la dirección para el registro del envío.','Dirección','Calle Mercaderes 45'],
  ['💬','Confirma y envía','Revisa todo con calma y envía tu pedido por WhatsApp.','WhatsApp','Pedido enviado ♥']]},
 4:{n:'Envío Express',i:'⚡',s:[
  ['📝','Tus datos','Escribe tu DNI o carnet de extranjería; con DNI tu nombre se completa solo, con carnet de extranjería lo escribes tú. Luego tu número de WhatsApp.','DNI - CE','45678912'],
@@ -1555,31 +1594,34 @@ setInterval(()=>{const n=Date.now();if(S.sleeping||S.drag||S.open||S.peek||down|
 S.lastIdle=n;let t;do{t=pick(IDLE)}while(t===S.lastMsg);S.lastMsg=t;react(pick(['happy','love','wink','dance']),t,3800)},1000);
 setInterval(()=>{if(root.dataset.mood==='idle'&&!S.drag&&!S.sleeping&&Math.random()<.6){mood('wink');setTimeout(()=>{if(root.dataset.mood==='wink'&&!S.drag&&!S.sleeping)mood('idle')},1100)}},15000);
 /* ---------- Curiosa: husmea lo que escribes ---------- */
-const FIELDS='#pedidoForm input[type=text],#pedidoForm input[type=tel],#pedidoForm input:not([type]),#pedidoForm textarea';
+const FIELDS='#pedidoForm input[type=text],#pedidoForm input[type=tel],#pedidoForm input:not([type]),#pedidoForm input[type=date],#pedidoForm textarea,#pedidoForm select';
 const PEEK=['¡Ooh, sigue, sigue! 👀','Mmm… interesante 🧐','No miro, ¡solo soy curiosa! 🙈','¡Qué bien escribes! ✨'];
 const cvm=document.createElement('canvas').getContext('2d');
 function look(el){const r=el.getBoundingClientRect(),s=SZ(),cs=getComputedStyle(el);let tx=r.left+r.width*.5;
-try{if(el.tagName==='INPUT'){cvm.font=cs.font;const w=cvm.measureText(el.value||'').width,pl=parseFloat(cs.paddingLeft)||12;tx=r.left+pl+Math.min(w,r.width-2*pl)}}catch(e){}
-const ty=r.top+r.height/2,ex=S.x+s/2,ey=S.y+s*.7,dx=tx-ex,dy=ty-ey,d=Math.hypot(dx,dy)||1,k=Math.min(1,d/50)*2.7;
+try{if(el.tagName==='INPUT'&&el.type!=='date'){cvm.font=cs.font;const w=cvm.measureText(el.value||'').width,pl=parseFloat(cs.paddingLeft)||12;tx=r.left+pl+Math.min(w,r.width-2*pl)}}catch(e){}
+const ty=r.top+Math.min(r.height/2,30),ex=S.x+s/2,ey=S.y+s*.7,dx=tx-ex,dy=ty-ey,d=Math.hypot(dx,dy)||1,k=Math.min(1,d/50)*2.7;
 root.style.setProperty('--px',(dx/d*k).toFixed(2));root.style.setProperty('--py',(dy/d*k).toFixed(2))}
-function peekUpdate(){const el=S.peek;if(!el||S.open||S.drag)return;const r=el.getBoundingClientRect(),s=SZ();if(r.bottom<0||r.top>H())return;
-let x=Math.min(W()-s-6,r.right-s-10),y=r.top-s*.78;S.peekBelow=false;if(y<4){y=r.bottom-s*.2;S.peekBelow=true}
+function peekUpdate(){const el=S.peek;if(!el||S.open||S.drag)return;const r=el.getBoundingClientRect(),s=SZ();
+let x=r.right-s-10,y=r.top-s*.78;S.peekBelow=false;if(y<4){y=r.bottom-s*.2;S.peekBelow=true}
+if(r.top>H()-s*.8)y=H()-s-4;
 S.x=x;S.y=y;clamp();apply();look(el)}
-function startPeek(el){if(S.open||S.drag)return;if(!S.pk&&!S.peek)S.pk={x:S.x,y:S.y};S.peek=el;wake();clearTimeout(tRev);bub.classList.remove('show');mood('curious');root.dataset.anim='';
-root.classList.add('mv');peekUpdate();setTimeout(()=>root.classList.remove('mv'),650);burst('curious',3)}
+let raf=0;const loop=()=>{peekUpdate();raf=S.peek?requestAnimationFrame(loop):0};
+function startPeek(el,src){if(S.open||S.drag)return;if(!S.pk&&!S.peek)S.pk={x:S.x,y:S.y};S.peek=el;S.peekSrc=src||'focus';wake();clearTimeout(tRev);bub.classList.remove('show');mood('curious');root.dataset.anim='';
+root.classList.add('mv');setTimeout(()=>root.classList.remove('mv'),650);burst('curious',3);if(!raf)loop()}
 function endPeek(){const was=S.peek;S.peek=null;S.peekBelow=false;root.style.setProperty('--px',0);root.style.setProperty('--py',0);
 if(S.pk){if(!S.open&&!S.drag){root.classList.add('mv');S.x=S.pk.x;S.y=S.pk.y;clamp();apply();setTimeout(()=>root.classList.remove('mv'),650)}S.pk=null}
 if(was&&!S.drag&&!S.sleeping)mood('idle')}
-document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches(FIELDS))startPeek(e.target)});
-document.addEventListener('focusout',()=>{if(!S.peek)return;setTimeout(()=>{const a=document.activeElement;if(a&&a.matches&&a.matches(FIELDS))return;endPeek()},350)});
+document.addEventListener('focusin',e=>{const t=e.target;if(t.matches&&t.matches(FIELDS))startPeek(t,'focus')});
+document.addEventListener('focusout',()=>{if(!S.peek||S.peekSrc==='click')return;setTimeout(()=>{if(S.peekSrc==='click')return;const a=document.activeElement;if(a&&a.matches&&a.matches(FIELDS))return;endPeek()},350)});
+document.addEventListener('click',e=>{if(S.open)return;const t=e.target;if(!t.closest||t.closest('#cPanel,#cari'))return;
+const a=t.closest('.radio-option,.ship-card');
+if(a){startPeek(a.classList.contains('radio-option')?(a.closest('.radio-group')||a):a,'click');return}
+if(S.peek&&S.peekSrc==='click')endPeek()});
 let tPk=0,tChat=0;
 const onKey=e=>{if(!S.peek||e.target!==S.peek)return;look(S.peek);const n=Date.now();
 if(n-tPk>180&&!S.drag&&root.dataset.mood==='curious'){tPk=n;root.dataset.anim='';void root.offsetWidth;root.dataset.anim='peek';setTimeout(()=>{if(root.dataset.anim==='peek')root.dataset.anim=''},400)}
 if(n-tChat>11000&&Math.random()<.12){tChat=n;say(pick(PEEK),2600)}};
 document.addEventListener('input',onKey);document.addEventListener('keyup',onKey);
-document.addEventListener('click',e=>{if(S.peek&&e.target===S.peek)look(S.peek)});
-const pu=()=>requestAnimationFrame(peekUpdate);addEventListener('scroll',pu,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',pu);
-setInterval(peekUpdate,400);
 /* ---------- Búsqueda de DNI ---------- */
 let iS=0,tS=0;
 const stopS=()=>{clearInterval(iS);clearTimeout(tS);iS=0};

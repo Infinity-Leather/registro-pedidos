@@ -358,6 +358,8 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
 #cPanel .cd p{margin:6px 0 0;color:var(--charcoal-soft);font-size:12.5px}
 #cPanel .cf{display:flex;gap:8px;padding:10px 14px 14px}
 #cPanel .cf button{flex:1;justify-content:center}
+.mb.sum{max-width:min(230px,calc(100vw - 28px))}
+.mb{max-width:min(150px,calc(100vw - 28px))}
 .mascot[data-mood="curious"] .k-curious{display:inline}
 .mascot .pup{transform:translate(calc(var(--px,0)*1px),calc(var(--py,0)*1px));transition:transform .18s ease-out}
 .mascot[data-mood="curious"] .rig{animation:mCurious 2.6s ease-in-out infinite}
@@ -1498,7 +1500,9 @@ return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="
 const GL={curious:['?','…','?'],happy:['✦','★','∞'],love:['♥','♥','✦'],wink:['★','✦'],wow:['!','✦','!'],dance:['♪','♫','✦'],sleep:['z','Z','z']};
 const DUR={happy:1900,love:2500,wink:1900,wow:1900,dance:3100};
 const $=id=>document.getElementById(id);
-const W=()=>document.documentElement.clientWidth,H=()=>innerHeight;
+const vv=window.visualViewport;
+const VX=()=>vv?vv.offsetLeft:0,VY=()=>vv?vv.offsetTop:0;
+const W=()=>vv?vv.offsetLeft+vv.width:document.documentElement.clientWidth,H=()=>vv?vv.offsetTop+vv.height:innerHeight;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const KEY='il-cari-pos';
@@ -1525,15 +1529,16 @@ build();
 S={x:0,y:0,fx:1,fy:.82,sleeping:false,drag:false,act:Date.now(),lastIdle:0,lastMsg:'',view:'menu',open:false,saved:null,lastTip:'',lastTipT:0,sh:{d:'',p:'',z:''}};
 const SZ=()=>root.offsetWidth||72;
 try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&isFinite(v.fx)&&isFinite(v.fy)){S.fx=v.fx;S.fy=v.fy}}catch(e){}
-const apply=()=>{root.style.transform='translate3d('+S.x+'px,'+S.y+'px,0)'};
-const clamp=()=>{const s=SZ();S.x=Math.min(Math.max(4,S.x),Math.max(4,W()-s-4));S.y=Math.min(Math.max(4,S.y),Math.max(4,H()-s-4))};
+const apply=()=>{root.style.transform='translate3d('+S.x+'px,'+S.y+'px,0)';fitBub()};
+function fitBub(force){if(!force&&!bub.classList.contains('show'))return;const bw=bub.offsetWidth,c=S.x+SZ()/2,l=c-bw/2,L=VX()+8,R=W()-8;let bx=0;if(l<L)bx=L-l;else if(l+bw>R)bx=R-(l+bw);bub.style.setProperty('--bx',bx+'px')}
+const clamp=()=>{const s=SZ(),x0=VX()+4,y0=VY()+4;S.x=Math.min(Math.max(x0,S.x),Math.max(x0,W()-s-4));S.y=Math.min(Math.max(y0,S.y),Math.max(y0,H()-s-4))};
 const fromFrac=()=>{const s=SZ();S.x=4+S.fx*Math.max(0,W()-s-8);S.y=4+S.fy*Math.max(0,H()-s-8);clamp();apply()};
 const save=()=>{const s=SZ();S.fx=(S.x-4)/Math.max(1,W()-s-8);S.fy=(S.y-4)/Math.max(1,H()-s-8);try{localStorage.setItem(KEY,JSON.stringify({fx:S.fx,fy:S.fy}))}catch(e){}};
 const mood=m=>{root.dataset.mood=m};
 const anim=a=>{root.dataset.anim='';void root.offsetWidth;root.dataset.anim=a};
 let tBub=0,tRev=0,iZ=0,tSleep=0;
 function say(t,ms){clearTimeout(tBub);bub.textContent=t;bub.classList.toggle('sum',t.length>60);bub.classList.toggle('below',S.peek?!!S.peekBelow:S.y<90);bub.style.setProperty('--bx','0px');
-const bw=bub.offsetWidth,c=S.x+SZ()/2,l=c-bw/2;let bx=0;if(l<8)bx=8-l;else if(l+bw>W()-8)bx=W()-8-(l+bw);bub.style.setProperty('--bx',bx+'px');
+fitBub(true);
 bub.classList.add('show');tBub=setTimeout(()=>bub.classList.remove('show'),ms||3200)}
 function burst(m,n){const cols=['#a3b52c','#657c1c','#c9a24b','#8aa02a'],gl=GL[m]||GL.happy,up=S.y>=70;
 for(let i=0;i<n;i++){const s=document.createElement('span'),g=gl[i%gl.length];s.className='mpt';s.textContent=g;s.style.color=g==='♥'?'#ff5f87':pick(cols);
@@ -1597,6 +1602,8 @@ root.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDe
 if(e.key==='Escape')closeP();const d={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key];if(d){e.preventDefault();S.x+=d[0];S.y+=d[1];clamp();apply();save()}});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
 addEventListener('resize',()=>{fromFrac();if(S.open)dock();peekUpdate()});
+const vpc=()=>{if(S.peek)peekUpdate();else if(S.open)dock();else if(!S.saved)fromFrac();fitBub()};
+if(vv){vv.addEventListener('resize',vpc);vv.addEventListener('scroll',vpc)}
 const act=()=>{S.act=Date.now();if(S.sleeping)wake();else sleepTimer()};
 ['pointerdown','keydown','touchstart','wheel','scroll'].forEach(ev=>addEventListener(ev,act,{passive:true}));
 setInterval(()=>{const n=Date.now();if(S.sleeping||S.drag||S.open||S.peek||down||n-S.act<9000||n-S.lastIdle<11000||bub.classList.contains('show'))return;
@@ -1611,7 +1618,7 @@ try{if(el.tagName==='INPUT'&&el.type!=='date'){cvm.font=cs.font;const w=cvm.meas
 const ty=r.top+Math.min(r.height/2,30),ex=S.x+s/2,ey=S.y+s*.7,dx=tx-ex,dy=ty-ey,d=Math.hypot(dx,dy)||1,k=Math.min(1,d/50)*2.7;
 root.style.setProperty('--px',(dx/d*k).toFixed(2));root.style.setProperty('--py',(dy/d*k).toFixed(2))}
 function peekUpdate(){const el=S.peek;if(!el||S.open||S.drag)return;const r=el.getBoundingClientRect(),s=SZ();
-let x=r.right-s-10,y=r.top-s*.78;S.peekBelow=false;if(y<4){y=r.bottom-s*.2;S.peekBelow=true}
+let x=r.right-s-10,y=r.top-s*.78;S.peekBelow=false;const bh=bub.classList.contains('show')&&!bub.classList.contains('below')?bub.offsetHeight+14:0;if(y-bh<VY()+4){y=r.bottom-s*.2;S.peekBelow=true}
 if(r.top>H()-s*.8)y=H()-s-4;
 S.x=x;S.y=y;clamp();apply();look(el)}
 let raf=0;const loop=()=>{peekUpdate();raf=S.peek?requestAnimationFrame(loop):0};

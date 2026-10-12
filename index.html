@@ -392,6 +392,15 @@ h2{font-size:21px;margin-bottom:3px}.subtitle{font-size:12.5px;line-height:1.4;m
 .bienvenida{padding:9px 30px 9px 10px;gap:9px;border-radius:14px}.bv-av{width:36px;height:36px;font-size:16px;box-shadow:0 0 0 3px #fff,0 0 0 4px var(--olive-soft)}
 .bv-txt small{font-size:9.5px}.bv-txt b{font-size:16px;margin:1px 0 2px}.bv-txt p{font-size:11.5px;margin-bottom:5px;line-height:1.35}.bv-badge{font-size:9.5px;padding:3px 9px}.bv-x{top:4px;right:6px;width:24px;height:24px;font-size:17px}
 .dni-estado{font-size:11px;margin-top:4px}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.form-grid{grid-template-columns:1fr 1fr;gap:8px 9px}
+.form-grid>.form-group{grid-column:1/-1}
+.form-grid>.form-group:has(#departamento),.form-grid>.form-group:has(#provincia){grid-column:auto}
+.form-group input[type=date]{height:36px;min-height:0;padding-top:0;padding-bottom:0}
+.form-group select{padding-right:26px}.form-group input,.form-group select{height:36px}
+h2{font-size:20px}.price-badge{margin-top:6px}.actions .btn{width:100%}
+#guiaInline{margin:0}.gdet{margin:2px 0 10px;border-radius:12px}
+#panelFormulario .card>.subtitle{margin-bottom:8px}
 .stage{min-height:300px;padding:16px}.scene{gap:10px}.scene h3{font-size:23px}.bigi{font-size:32px}.mock{padding:9px 12px}.cap{font-size:12px;padding:9px 11px}.side{padding:14px}.side h4{font-size:21px}.st{padding:7px 9px;font-size:12.5px}
 .mascot#cari{--ms:58px}.mb{font-size:.68rem;padding:6px 9px}
 #cPanel .cb{padding:10px 10px 4px;gap:8px;font-size:12.5px}#cPanel .ch{padding:8px 10px}#cPanel .ch b{font-size:14px}#cPanel .ch small{font-size:10px}
@@ -1441,7 +1450,7 @@ function gVoz(){gV=!gV;$('gVoz').textContent=gV?'🔊 Voz':'🔇 Voz';gRender()}
 function gElegir(){cerrarGuia();if($('modalEnvio').style.display!=='none')seleccionarEnvio(gT)}
 document.querySelectorAll('.ship-card').forEach(c=>{const t=+c.dataset.tipo;c.children[1].insertAdjacentHTML('beforeend','<button type="button" class="ship-guide" onclick="event.stopPropagation();abrirGuia('+t+')">▶ Ver guía paso a paso</button>')});
 const _c=continuarEnvio;continuarEnvio=function(){_c();const g=G[tipoEnvioSeleccionado];
- $('guiaInline').innerHTML='<details class="gdet" open><summary>'+g.i+' Guía: cómo registrar tu '+g.n.toLowerCase()+' <span>＋</span></summary><ol>'+g.s.map(x=>'<li><b>'+x[1]+'.</b> '+x[2]+'</li>').join('')+'</ol><button type="button" class="ship-guide" onclick="abrirGuia('+tipoEnvioSeleccionado+')">▶ Ver el video guía</button></details>'};
+ $('guiaInline').innerHTML='<details class="gdet"'+(!window.matchMedia||matchMedia('(min-width:601px)').matches?' open':'')+'><summary>'+g.i+' Guía: cómo registrar tu '+g.n.toLowerCase()+' <span>＋</span></summary><ol>'+g.s.map(x=>'<li><b>'+x[1]+'.</b> '+x[2]+'</li>').join('')+'</ol><button type="button" class="ship-guide" onclick="abrirGuia('+tipoEnvioSeleccionado+')">▶ Ver el video guía</button></details>'};
 </script>
 <script id="cariJs">
 /* ===== Cari: asistente de envíos ===== */
@@ -1612,11 +1621,11 @@ function endPeek(){const was=S.peek;S.peek=null;S.peekBelow=false;root.style.set
 if(S.pk){if(!S.open&&!S.drag){root.classList.add('mv');S.x=S.pk.x;S.y=S.pk.y;clamp();apply();setTimeout(()=>root.classList.remove('mv'),650)}S.pk=null}
 if(was&&!S.drag&&!S.sleeping)mood('idle')}
 document.addEventListener('focusin',e=>{const t=e.target;if(t.matches&&t.matches(FIELDS))startPeek(t,'focus')});
-document.addEventListener('focusout',()=>{if(!S.peek||S.peekSrc==='click')return;setTimeout(()=>{if(S.peekSrc==='click')return;const a=document.activeElement;if(a&&a.matches&&a.matches(FIELDS))return;endPeek()},350)});
+document.addEventListener('focusout',()=>{if(!S.peek)return;if(S.coachOn){window.cariCoach&&cariCoach(500);return}if(S.peekSrc==='click')return;setTimeout(()=>{if(S.peekSrc==='click')return;const a=document.activeElement;if(a&&a.matches&&a.matches(FIELDS))return;endPeek()},350)});
 document.addEventListener('click',e=>{if(S.open)return;const t=e.target;if(!t.closest||t.closest('#cPanel,#cari'))return;
 const a=t.closest('.radio-option,.ship-card');
 if(a){startPeek(a.classList.contains('radio-option')?(a.closest('.radio-group')||a):a,'click');return}
-if(S.peek&&S.peekSrc==='click')endPeek()});
+if(S.peek&&S.peekSrc==='click'){if(S.coachOn)window.cariCoach&&cariCoach(400);else endPeek()}});
 let tPk=0,tChat=0;
 const onKey=e=>{if(!S.peek||e.target!==S.peek)return;look(S.peek);const n=Date.now();
 if(n-tPk>180&&!S.drag&&root.dataset.mood==='curious'){tPk=n;root.dataset.anim='';void root.offsetWidth;root.dataset.anim='peek';setTimeout(()=>{if(root.dataset.anim==='peek')root.dataset.anim=''},400)}
@@ -1644,6 +1653,47 @@ hook('confirmarPedido',()=>setTimeout(()=>{if(!$('panelGracias').hidden){closeP(
 hook('volverAEditar',()=>tip('Corrige lo que necesites y confirma otra vez ✍️','wink'));
 hook('enviarPedidoWhatsApp',()=>tip('¡Listo! Se abrió WhatsApp con tu pedido 💚 ¡Gracias por elegirnos!','love'));
 hook('abrirGuia',()=>{closeP();bub.classList.remove('show')});
+/* ---------- Coach: Cari te guía paso a paso hasta completar el envío ---------- */
+const ORDER=['dni','nombres','telefono','departamento','provincia','zona','lugarEntrega','direccion','fechaRecojo','horarioRecojo','fechaMotorizado','fechaExpress','fechaShalom'];
+const CHK={dni:()=>{const v=$('dni').value.trim();return tipoEnvioSeleccionado===2?(!v||/^\d{8,11}$/.test(v)):/^\d{8,11}$/.test(v)},
+nombres:()=>$('nombres').value.trim().length>=3,telefono:()=>/^\d{7,12}$/.test($('telefono').value.trim()),
+departamento:()=>!!$('departamento').value,provincia:()=>!!$('provincia').value,zona:()=>!!$('zona').value,lugarEntrega:()=>!!$('lugarEntrega').value,
+direccion:()=>$('direccion').value.trim().length>=5,fechaRecojo:()=>$('fechaRecojo').value>=getHoy(),horarioRecojo:()=>!!horarioRecojoSeleccionado,
+fechaMotorizado:()=>$('fechaMotorizado').value>=getMinFechaMotorizado(),fechaExpress:()=>$('fechaExpress').value>=getHoy(),fechaShalom:()=>$('fechaShalom').value>=getHoy()};
+const CMSG={dni:()=>'Escribe tu DNI o carnet de extranjería 👇 Si ya compraste antes, te reconozco ✨',nombres:()=>'Ahora tu nombre completo 📝',telefono:()=>'Tu número de WhatsApp 📱',departamento:()=>'Elige tu departamento 🧭',provincia:()=>'Ahora tu provincia 📍',
+zona:()=>tipoEnvioSeleccionado===3?'Elige tu zona / distrito 🧭':'Elige tu distrito 📍',lugarEntrega:()=>'Elige la agencia Shalom donde recogerás 🏢',direccion:()=>'Escribe tu dirección de entrega 🏡',
+fechaRecojo:()=>'Elige el día que pasarás por el taller 📅',horarioRecojo:()=>'Elige tu horario de recojo 🕙',fechaMotorizado:()=>'Elige la fecha de entrega (llega entre 12:00 pm y 7:00 pm) 📅',fechaExpress:()=>'Elige la fecha de entrega express ⚡',fechaShalom:()=>'Elige la fecha de envío 📦'};
+function nextStep(){
+if(modalOn()){if(!tipoEnvioSeleccionado)return{key:'ship',el:document.querySelector('.ship-card'),msg:'Elige cómo quieres recibir tu pedido 👇 Toca una opción'};
+return{key:'cont',el:$('btnContinuar'),msg:'¡Buena elección! Ahora pulsa Continuar ➜'}}
+if(!$('panelGracias').hidden)return{key:'send',el:document.querySelector('#panelGracias .btn-primary'),msg:'Revisa tus datos y pulsa Enviar pedido 💬 Si algo está mal, usa Modificar datos'};
+if($('panelFormulario').hidden)return null;
+const bad=document.querySelector('#pedidoForm .form-group.invalid');
+if(bad){const c=bad.querySelector('input,select,textarea,.radio-group')||bad;return{key:'bad:'+(c.id||bad.id),el:c,msg:'Revisa este campo 👇 Le falta algo'}}
+for(const id of ORDER){const el=id==='horarioRecojo'?document.querySelector('#grupoHorarioRecojo .radio-group'):$(id),g=id==='horarioRecojo'?$('grupoHorarioRecojo'):(el&&el.closest('.form-group'));
+if(!el||!g||g.hidden||el.disabled||CHK[id]())continue;return{key:id,el,msg:CMSG[id]()}}
+return{key:'confirm',el:document.querySelector('#pedidoForm .actions .btn-primary'),msg:'¡Todo listo! Pulsa Confirmar pedido ✅'}}
+window.cariNext=nextStep;
+let tC=0,lastNudge=0;S.coachOn=true;S.coachKey='';
+function coachSoon(ms){clearTimeout(tC);tC=setTimeout(coachRun,ms==null?1400:ms)}
+window.cariCoach=coachSoon;
+function coachRun(){if(!S.coachOn||S.open||S.drag)return;const gd=$('guia');if(gd&&gd.classList.contains('on'))return;
+const st=nextStep();if(!st||!st.el){if(S.peek&&S.peekSrc==='coach')endPeek();return}
+const act=document.activeElement;
+if(act&&act!==st.el&&act.id&&CHK[act.id]&&!CHK[act.id]()&&act.matches&&act.matches(FIELDS)&&Date.now()-S.act<4000)return;
+if(S.peek!==st.el)startPeek(st.el,'coach');else S.peekSrc='coach';
+const r=st.el.getBoundingClientRect();if(r.top<80||r.bottom>H()-100){try{st.el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}}
+if(S.coachKey===st.key)return;S.coachKey=st.key;lastNudge=Date.now();
+if(act===st.el)return;react('happy',st.msg,5400)}
+['input','change','click'].forEach(ev=>document.addEventListener(ev,()=>coachSoon(ev==='input'?2200:1200)));
+setInterval(()=>{if(!S.coachOn||S.open||S.drag)return;const n=Date.now();if(n-S.act<12000||n-lastNudge<16000||bub.classList.contains('show'))return;
+const st=nextStep();if(!st)return;lastNudge=n;react('wink',st.msg,4200)},3000);
+hook('seleccionarEnvio',()=>coachSoon(900));hook('continuarEnvio',()=>coachSoon(1200));hook('volverAtras',()=>coachSoon(1200));hook('volverAEditar',()=>coachSoon(1200));
+hook('confirmarPedido',()=>coachSoon(3200));
+hook('enviarPedidoWhatsApp',()=>{S.coachOn=false;clearTimeout(tC);setTimeout(()=>endPeek(),600)});
+const _ce=window.cariEvent;window.cariEvent=(t,d)=>{_ce(t,d);if(t!=='search')coachSoon(t==='error'?800:4800)};
+coachSoon(7500);
+
 fromFrac();requestAnimationFrame(()=>root.classList.add('on'));sleepTimer();
 if(!helloDone){helloDone=true;setTimeout(()=>{if(S.open||S.drag)return;mood('dance');anim('dance');say('¡¡HOLAAA!! 🎉 ¡Soy Cari y qué emoción verte por aquí!',3400);burst('dance',14);if(navigator.vibrate)try{navigator.vibrate([20,40,20])}catch(e){}
 setTimeout(()=>{if(!S.open&&!S.drag){mood('wow');anim('wow');burst('happy',8)}},1700);

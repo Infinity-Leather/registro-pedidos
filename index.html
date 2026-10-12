@@ -392,7 +392,7 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
         </div>
         <div class="ship-card" data-tipo="2" onclick="seleccionarEnvio(2)">
           <div class="ship-icon">🛵</div>
-          <div><span class="ship-name">Envío motorizado (courier)</span><span class="ship-desc">Programa la fecha de entrega (Lima/Callao)</span></div>
+          <div><span class="ship-name">Envío motorizado (courier)</span><span class="ship-desc">Programa la fecha; entrega de 12:00 pm a 7:00 pm (Lima/Callao)</span></div>
           <div class="ship-check">✓</div>
         </div>
         <div class="ship-card" data-tipo="3" onclick="seleccionarEnvio(3)">
@@ -402,7 +402,7 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
         </div>
         <div class="ship-card" data-tipo="4" onclick="seleccionarEnvio(4)">
           <div class="ship-icon">⚡</div>
-          <div><span class="ship-name">Envío Express</span><span class="ship-desc">Entrega el mismo día — solo Lima/Callao</span></div>
+          <div><span class="ship-name">Envío Express</span><span class="ship-desc">Mismo día, previo pago del pedido — solo Lima/Callao</span></div>
           <div class="ship-check">✓</div>
         </div>
       </div>
@@ -532,6 +532,9 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
             <label for="fechaMotorizado">Fecha programada de entrega</label>
             <input type="date" id="fechaMotorizado">
             <div class="field-error">Antes de las 8:00am puedes elegir hoy; después, solo fechas posteriores a hoy</div>
+            <div class="notice-box" style="margin-top:10px">
+              🛵 <strong>Importante:</strong> La entrega se realiza en la fecha indicada, entre las <strong>12:00 pm y las 7:00 pm</strong>. No hay un horario fijo de entrega.
+            </div>
           </div>
 
           <!-- Fecha express -->
@@ -539,6 +542,9 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
             <label for="fechaExpress">Fecha de entrega express</label>
             <input type="date" id="fechaExpress">
             <div class="field-error">La fecha no puede ser anterior a hoy</div>
+            <div class="notice-box" style="margin-top:10px">
+              ⚡ <strong>Importante:</strong> El envío Express es <strong>previo pago del total del pedido</strong>. El <strong>costo de envío</strong> se paga al motorizado cuando llegue con tu pedido.
+            </div>
           </div>
 
           <!-- Tipo de envío Shalom: Terrestre / Aéreo -->
@@ -841,9 +847,9 @@ function continuarEnvio(){
 
   const config={
     1:{icono:'🏠',titulo:'Recojo en tienda',sub:'Completa tus datos y programa tu visita al taller.',depto:'LIMA',prov:'LIMA',zona:'recojo_fijo',fechaRecojo:true,horarioRecojo:true,fechaM:false,fechaE:false,fechaShalom:false,maps:false,direccion:false,referencia:false,precioM:false,lugarEntrega:false},
-    2:{icono:'🛵',titulo:'Envío motorizado (courier)',sub:'Selecciona tu distrito para ver el costo de envío y programa la fecha.',depto:'LIMA',prov:'LIMA',zona:'distrito_motorizado',fechaRecojo:false,horarioRecojo:false,fechaM:true,fechaE:false,fechaShalom:false,maps:true,direccion:true,referencia:true,precioM:true,lugarEntrega:false},
+    2:{icono:'🛵',titulo:'Envío motorizado (courier)',sub:'Selecciona tu distrito para ver el costo de envío y programa la fecha. La entrega es de 12:00 pm a 7:00 pm, sin horario fijo.',depto:'LIMA',prov:'LIMA',zona:'distrito_motorizado',fechaRecojo:false,horarioRecojo:false,fechaM:true,fechaE:false,fechaShalom:false,maps:true,direccion:true,referencia:true,precioM:true,lugarEntrega:false},
     3:{icono:'📦',titulo:'Envío Shalom',sub:'Selecciona departamento, provincia y zona de entrega nacional.',depto:'shalom',prov:'shalom',zona:'shalom',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:false,fechaShalom:true,tipoTransporte:true,maps:false,direccion:true,referencia:false,precioM:false,lugarEntrega:true},
-    4:{icono:'⚡',titulo:'Envío Express',sub:'Entrega el mismo día (sujeta a horario y disponibilidad).',depto:'LIMA',prov:'LIMA',zona:'distrito_lima',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:true,fechaShalom:false,maps:false,direccion:true,referencia:false,precioM:false,lugarEntrega:false}
+    4:{icono:'⚡',titulo:'Envío Express',sub:'Entrega el mismo día (sujeta a horario y disponibilidad). Es previo pago del total del pedido; el costo de envío se paga al motorizado cuando llegue.',depto:'LIMA',prov:'LIMA',zona:'distrito_lima',fechaRecojo:false,horarioRecojo:false,fechaM:false,fechaE:true,fechaShalom:false,maps:false,direccion:true,referencia:false,precioM:false,lugarEntrega:false}
   };
   const c=config[tipoEnvioSeleccionado];
 
@@ -1342,7 +1348,7 @@ const G={
  ['📍','Tu distrito','Elige tu distrito de Lima o Callao y verás el costo del envío al instante.','Zona / Distrito','San Isidro · S/ 10'],
  ['🏡','Dirección y referencia','Escribe calle, número e interior. Una referencia ayuda mucho al courier.','Dirección de entrega','Av. Los Rosales 123'],
  ['🗺️','Ubicación (opcional)','Si quieres, pega el enlace de Google Maps de tu ubicación.','Enlace de Maps','maps.app.goo.gl/…'],
- ['📅','Fecha de entrega','Antes de las 8:00 am puedes elegir hoy; después, desde mañana.','Fecha programada','Viernes'],
+ ['📅','Fecha de entrega','Antes de las 8:00 am puedes elegir hoy; después, desde mañana. Tu pedido llega en la fecha elegida, entre las 12:00 pm y las 7:00 pm: no hay un horario fijo de entrega.','Fecha programada','Viernes'],
  ['💬','Confirma y envía','Revisa el resumen y envíalo por WhatsApp.','WhatsApp','Pedido enviado ♥']]},
 3:{n:'Envío Shalom',i:'📦',s:[
  ['📝','Tus datos','Escribe tu DNI o carnet de extranjería; con DNI tu nombre se completa solo. Con carnet de extranjería escribe tu nombre completo. Después tu WhatsApp. Shalom los pide para entregarte.','DNI - CE','45678912'],
@@ -1356,6 +1362,7 @@ const G={
  ['📍','Distrito','Disponible solo en Lima y Callao. Elige tu distrito.','Zona / Distrito','Miraflores'],
  ['🏡','Dirección','Calle, número e interior para que llegue el mismo día.','Dirección de entrega','Calle Berlín 210'],
  ['📅','Fecha','Selecciona la fecha de entrega express, desde hoy.','Fecha express','Hoy'],
+ ['💳','Pago previo','El envío Express es previo pago del total del pedido. El costo de envío se paga al motorizado cuando llegue con tu pedido.','Pago','Total del pedido'],
  ['💬','Confirma y envía','Pulsa Confirmar pedido y luego Enviar pedido por WhatsApp.','WhatsApp','Pedido enviado ♥']]}};
 let gT=1,gI=0,gP=true,gV=false,gTm,gTy;
 const $=id=>document.getElementById(id);
@@ -1441,10 +1448,10 @@ const KEY='il-cari-pos';
 const MINI='<div class="mascot mini on" data-mood="happy"><div class="rig">'+svgFor(false)+'</div></div>';
 const INFO={
 1:{i:'🏠',n:'Recojo en tienda',t:'Pasas por nuestro <b>taller</b> a retirar tu pedido. Eliges la fecha y una franja: <b>10:00–12:00</b> o <b>5:00–7:00 pm</b>. Te avisamos <b>1 hora antes</b>.'},
-2:{i:'🛵',n:'Envío motorizado',t:'Courier en <b>Lima y Callao</b> con fecha programada. Antes de las <b>8:00 am</b> puedes elegir hoy; después, desde mañana. El costo depende de tu distrito.'},
+2:{i:'🛵',n:'Envío motorizado',t:'Courier en <b>Lima y Callao</b> con fecha programada. Antes de las <b>8:00 am</b> puedes elegir hoy; después, desde mañana. Llega en la fecha elegida, entre las <b>12:00 pm y las 7:00 pm</b> (sin horario fijo). El costo depende de tu distrito.'},
 3:{i:'📦',n:'Envío Shalom',t:'Entrega a <b>nivel nacional</b> vía agencia Shalom, por vía <b>terrestre o aérea</b>. Eliges el punto de entrega y Shalom pide tu DNI o carnet.'},
-4:{i:'⚡',n:'Envío Express',t:'Entrega <b>el mismo día</b>, solo en <b>Lima y Callao</b>, sujeta a horario y disponibilidad.'}};
-const TIPS={dni:'Escribe tu DNI o carnet de extranjería. Con DNI, tu nombre se completa solo ✨',nombres:'Tu nombre completo, tal como figura en tu documento 📝',telefono:'Tu número de WhatsApp: por ahí te escribiremos 💚',departamento:'Elige tu departamento para ver las opciones 🧭',provincia:'Ahora tu provincia 📍',zona:'Elige tu zona o distrito ✨',lugarEntrega:'Elige la agencia Shalom donde recogerás tu pedido 🏢',direccion:'Calle, número e interior. ¡Mientras más claro, mejor llega! 🏡',referencia:'Una referencia ayuda mucho al courier: portón, parque cercano… 🛵',ubicacionMaps:'Opcional: pega el enlace de tu ubicación de Google Maps 🗺️',fechaRecojo:'¿Qué día pasarás por el taller? No puede ser antes de hoy 📅',fechaMotorizado:'Antes de las 8:00 am puedes elegir hoy; después, desde mañana 📅',fechaExpress:'Elige la fecha de entrega express, desde hoy ⚡',fechaShalom:'¿Qué día enviamos tu paquete? 📦'};
+4:{i:'⚡',n:'Envío Express',t:'Entrega <b>el mismo día</b>, solo en <b>Lima y Callao</b>, sujeta a horario y disponibilidad. Es <b>previo pago del total del pedido</b>; el costo de envío se paga al motorizado cuando llegue con tu pedido.'}};
+const TIPS={dni:'Escribe tu DNI o carnet de extranjería. Con DNI, tu nombre se completa solo ✨',nombres:'Tu nombre completo, tal como figura en tu documento 📝',telefono:'Tu número de WhatsApp: por ahí te escribiremos 💚',departamento:'Elige tu departamento para ver las opciones 🧭',provincia:'Ahora tu provincia 📍',zona:'Elige tu zona o distrito ✨',lugarEntrega:'Elige la agencia Shalom donde recogerás tu pedido 🏢',direccion:'Calle, número e interior. ¡Mientras más claro, mejor llega! 🏡',referencia:'Una referencia ayuda mucho al courier: portón, parque cercano… 🛵',ubicacionMaps:'Opcional: pega el enlace de tu ubicación de Google Maps 🗺️',fechaRecojo:'¿Qué día pasarás por el taller? No puede ser antes de hoy 📅',fechaMotorizado:'Antes de las 8:00 am puedes elegir hoy; después, desde mañana. Llega esa fecha entre 12:00 pm y 7:00 pm, sin hora fija 🛵',fechaExpress:'Elige la fecha express, desde hoy. Recuerda: pagas el pedido antes y el envío al motorizado cuando llegue ⚡',fechaShalom:'¿Qué día enviamos tu paquete? 📦'};
 const IDLE=['¿Dudas con tu envío? Tócame y te ayudo 💬','Con tu DNI se completa tu nombre solo ✨','¡Tu pedido va a quedar precioso! 💚','Tip: antes de enviar, revisa bien tus datos 👀','Puedo decirte cuánto cuesta el envío a tu distrito 🛵','Tócame para ver horarios, costos y agencias 📦','Cada detalle cuenta: ¡qué buena elección! ✨'];
 let root,bub,fx,panel,body,S,helloDone=false;
 function modalOn(){const m=$('modalEnvio');return m&&getComputedStyle(m).display!=='none'}
@@ -1492,7 +1499,7 @@ const VIEWS={
 menu:()=>bubble('¡Hola! Soy <b>Cari</b> 💚 Estoy aquí para ayudarte con tu envío. ¿Qué necesitas?')+chips([['📦','Tipos de envío','tipos'],['💰','Costo a mi distrito','costo'],['⏰','Horarios y plazos','horarios'],['🏢','Agencias Shalom','shalom'],['📝','Ayuda con mi formulario','form'],['▶','Guías paso a paso','guias'],['❓','Preguntas frecuentes','faq']]),
 tipos:()=>bubble('Tenemos <b>4 formas</b> de recibir tu pedido:')+[1,2,3,4].map(t=>'<div class="ci"><b>'+INFO[t].i+' '+INFO[t].n+'</b><p>'+INFO[t].t+'</p><div class="cr"><button data-a="pick" data-t="'+t+'">Elegir este</button><button data-a="guia" data-t="'+t+'">▶ Guía</button></div></div>').join(''),
 costo:()=>bubble('El <b>envío motorizado</b> (Lima y Callao) depende de tu distrito. Elige el tuyo y te digo el costo 🛵')+'<select data-sel="costo">'+'<option value="" disabled selected>Selecciona tu distrito</option>'+[...preciosMotorizado].sort((a,b)=>a.distrito.localeCompare(b.distrito,'es',{sensitivity:'base'})).map(d=>'<option value="'+esc(d.distrito)+'">'+esc(d.distrito)+'</option>').join('')+'</select><div id="cOut"></div>',
-horarios:()=>bubble('Estos son los <b>horarios y plazos</b> de cada envío ⏰')+'<div class="ci"><b>🏠 Recojo en tienda</b><p>Franjas: 10:00–12:00 y 5:00–7:00 pm. Te avisamos 1 hora antes. La fecha no puede ser anterior a hoy.</p></div><div class="ci"><b>🛵 Motorizado</b><p>Antes de las 8:00 am puedes elegir hoy; después, solo fechas posteriores a hoy.</p></div><div class="ci"><b>⚡ Express</b><p>Mismo día en Lima y Callao, sujeto a horario y disponibilidad.</p></div><div class="ci"><b>📦 Shalom</b><p>Terrestre o aéreo, tú eliges la fecha de envío. Los tiempos de llegada los define Shalom.</p></div><p class="cn">¿Otra duda de plazos? Escríbele a Rut por WhatsApp 💬</p>',
+horarios:()=>bubble('Estos son los <b>horarios y plazos</b> de cada envío ⏰')+'<div class="ci"><b>🏠 Recojo en tienda</b><p>Franjas: 10:00–12:00 y 5:00–7:00 pm. Te avisamos 1 hora antes. La fecha no puede ser anterior a hoy.</p></div><div class="ci"><b>🛵 Motorizado</b><p>Antes de las 8:00 am puedes elegir hoy; después, solo fechas posteriores a hoy. La entrega es en la fecha elegida, de 12:00 pm a 7:00 pm, sin horario fijo.</p></div><div class="ci"><b>⚡ Express</b><p>Mismo día en Lima y Callao, sujeto a horario y disponibilidad. Previo pago del total del pedido; el costo de envío se paga al motorizado cuando llegue.</p></div><div class="ci"><b>📦 Shalom</b><p>Terrestre o aéreo, tú eliges la fecha de envío. Los tiempos de llegada los define Shalom.</p></div><p class="cn">¿Otra duda de plazos? Escríbele a Rut por WhatsApp 💬</p>',
 shalom:()=>{const d=S.sh.d,p=S.sh.p,z=S.sh.z;let h=bubble('Busca la <b>agencia Shalom</b> más cercana a ti 🏢');
 h+='<select data-sel="sd">'+opts(sortK(shalomData),d,'Departamento')+'</select>';
 if(d)h+='<select data-sel="sp">'+opts(sortK(shalomData[d]),p,'Provincia')+'</select>';
@@ -1502,7 +1509,7 @@ return h},
 form:()=>{const t=tipoEnvioSeleccionado;if(!t)return bubble('Primero elige <b>cómo quieres recibir</b> tu pedido y te guío campo por campo 💚')+chips([['📦','Ver tipos de envío','tipos']]);
 return bubble('Para tu <b>'+INFO[t].n.toLowerCase()+'</b> haz esto:')+'<ol class="cl">'+G[t].s.map(x=>'<li><b>'+x[1]+'.</b> '+x[2]+'</li>').join('')+'</ol><div class="cr"><button data-a="guia" data-t="'+t+'">▶ Ver video guía</button></div>'},
 guias:()=>bubble('Mira la <b>guía paso a paso</b> del envío que te interesa ▶')+chips([['🏠','Recojo en tienda','g1'],['🛵','Motorizado','g2'],['📦','Shalom','g3'],['⚡','Express','g4']]),
-faq:()=>bubble('Las dudas más comunes ❓')+[['¿Puedo corregir mis datos?','Sí. En la pantalla final, antes de enviar, usa el botón <b>Modificar datos</b>.'],['¿Cómo envío mi pedido?','Pulsa <b>Confirmar pedido</b> y luego <b>Enviar pedido</b>: se abre WhatsApp con tu resumen listo.'],['No tengo DNI, ¿qué hago?','Usa tu carnet de extranjería y escribe tu nombre completo a mano.'],['¿El DNI es obligatorio en motorizado?','En motorizado es opcional. Si lo escribes, tu nombre se completa solo.'],['¿Dónde hay Express y motorizado?','Solo en Lima y Callao. Para provincias usa Shalom.']].map(q=>'<details class="cd"><summary>'+q[0]+'</summary><p>'+q[1]+'</p></details>').join('')};
+faq:()=>bubble('Las dudas más comunes ❓')+[['¿Puedo corregir mis datos?','Sí. En la pantalla final, antes de enviar, usa el botón <b>Modificar datos</b>.'],['¿Cómo envío mi pedido?','Pulsa <b>Confirmar pedido</b> y luego <b>Enviar pedido</b>: se abre WhatsApp con tu resumen listo.'],['No tengo DNI, ¿qué hago?','Usa tu carnet de extranjería y escribe tu nombre completo a mano.'],['¿El DNI es obligatorio en motorizado?','En motorizado es opcional. Si lo escribes, tu nombre se completa solo.'],['¿Cómo se paga el envío Express?','El pedido se paga por adelantado (total del pedido). El costo de envío lo pagas al motorizado cuando llegue con tu pedido.'],['¿A qué hora llega el motorizado?','Llega en la fecha que elegiste, entre las 12:00 pm y las 7:00 pm. No hay un horario fijo de entrega.'],['¿Dónde hay Express y motorizado?','Solo en Lima y Callao. Para provincias usa Shalom.']].map(q=>'<details class="cd"><summary>'+q[0]+'</summary><p>'+q[1]+'</p></details>').join('')};
 function go(v){S.view=v;body.innerHTML=(VIEWS[v]||VIEWS.menu)();body.scrollTop=0}
 function dock(){const r=panel.getBoundingClientRect(),s=SZ();S.saved={x:S.x,y:S.y};root.classList.add('mv');
 S.x=Math.min(W()-s-8,r.right-s-4);S.y=r.top-s-2;if(S.y<4){S.x=Math.max(4,r.left-s-6);S.y=Math.max(4,H()-s-12)}clamp();apply();setTimeout(()=>root.classList.remove('mv'),600)}

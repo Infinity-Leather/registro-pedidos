@@ -226,6 +226,34 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
 .st.on{background:var(--olive-pale);border-color:var(--olive-soft)}.st.on span{background:var(--olive-dark);color:#fff}
 .x{margin-left:auto;background:none;border:0;font-size:22px;color:#fff;cursor:pointer}
 .side .btn{margin-top:auto}
+
+/* ===== Bienvenida a cliente frecuente ===== */
+.dni-estado{display:none;font-size:12px;margin-top:6px;color:var(--stone)}
+.dni-estado.on{display:block}
+.dni-estado.buscando{color:var(--olive)}
+.dni-estado.buscando::before{content:"";display:inline-block;width:10px;height:10px;margin-right:6px;border:2px solid var(--olive-soft);border-top-color:var(--olive);border-radius:50%;vertical-align:-1px;animation:bvspin .7s linear infinite}
+.dni-estado.nuevo{color:var(--olive-dark)}
+@keyframes bvspin{to{transform:rotate(360deg)}}
+.bienvenida{position:relative;display:flex;gap:14px;align-items:center;padding:16px 40px 16px 16px;border-radius:20px;overflow:hidden;
+  background:linear-gradient(135deg,#fff 0%,var(--olive-pale) 100%);border:1px solid var(--olive-soft);box-shadow:var(--shadow)}
+.bienvenida[hidden]{display:none}
+.bienvenida::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.7) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.bienvenida.in{animation:bvin .55s cubic-bezier(.2,.9,.25,1.15) both}
+.bienvenida.in::after{animation:bvshine 1.4s .35s ease-out 1}
+@keyframes bvin{from{opacity:0;transform:translateY(-10px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes bvshine{to{transform:translateX(120%)}}
+.bv-av{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--olive-dark);color:var(--bg);
+  font-family:'Bodoni Moda',Georgia,serif;font-size:24px;font-weight:600;box-shadow:0 0 0 4px #fff,0 0 0 5px var(--olive-soft)}
+.bv-txt small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--olive)}
+.bv-txt b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:clamp(19px,4.6vw,24px);color:var(--olive-dark);line-height:1.2;margin:2px 0 4px}
+.bv-txt p{font-size:13.5px;color:var(--charcoal-soft);line-height:1.45;margin:0 0 8px}
+.bv-badge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--olive-dark);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.04em}
+.bv-x{position:absolute;top:8px;right:10px;width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:var(--stone);font-size:20px;line-height:1;cursor:pointer}
+.bv-x:hover{background:#0000000d;color:var(--charcoal)}
+.flash{animation:bvflash 1.1s ease-out 1}
+@keyframes bvflash{0%{box-shadow:0 0 0 0 #a3b52c99;background:#f1f6d8}100%{box-shadow:0 0 0 12px #a3b52c00}}
+@media(max-width:560px){.bienvenida{padding:14px 36px 14px 14px;gap:12px}.bv-av{width:44px;height:44px;font-size:20px}}
+@media(prefers-reduced-motion:reduce){.bienvenida.in,.bienvenida.in::after,.flash{animation:none}}
 </style>
 
 </head>
@@ -299,6 +327,8 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
             <input type="text" id="dni" inputmode="numeric" maxlength="11" placeholder="Ej: 45678912">
             <div class="field-error">Ingresa un DNI o carnet de extranjería válido (8 a 11 dígitos)</div>
           </div>
+
+          <div class="form-group full bienvenida" id="bienvenida" hidden role="status" aria-live="polite"></div>
 
           <div class="form-group full">
             <label for="nombres">Nombres completos</label>
@@ -1041,6 +1071,7 @@ function construirMensajeWhatsApp(p){
 
 function enviarPedidoWhatsApp(){
   if(!ultimoPedido) return;
+  guardarCliente(ultimoPedido);
   const mensaje=construirMensajeWhatsApp(ultimoPedido);
   const url='https://wa.me/'+WHATSAPP_DESTINO+'?text='+encodeURIComponent(mensaje);
   window.open(url, '_blank');
@@ -1049,83 +1080,140 @@ function enviarPedidoWhatsApp(){
 // Inicializar evento de lugar de entrega
 document.getElementById('lugarEntrega').addEventListener('change', onLugarEntregaChange);
 
-/* ===== Autocompletar nombres desde DNI (CODART vía Apps Script) ===== */
-// URL de tu Apps Script publicado (Implementar → Aplicación web → URL que termina en /exec)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl12AHdQtC9J64CkJfbsRvnErf6HuogNptWG47nMwbuROb8Vdv95Pgx-4Ojn0RPdur/exec';
+/* ===== Clientes frecuentes: búsqueda por DNI/CE en Google Sheets (vía Apps Script) ===== */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx53WmI47KuVDDFiAxiw_ZSK0HCnmz473bhirsJK13wtTCQyi07hTzzSbSiAx08OTUmFg/exec';
+
+/* Confeti ligero (canvas, sin librerías) */
+function lanzarConfeti(){
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv=document.createElement('canvas');
+  cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+  document.body.appendChild(cv);
+  const ctx=cv.getContext('2d'), dpr=Math.min(window.devicePixelRatio||1,2);
+  const W=cv.width=innerWidth*dpr, H=cv.height=innerHeight*dpr;
+  const cols=['#657c1c','#a3b52c','#c6d28a','#d9b45a','#f0d98a','#2d3516','#ffffff'];
+  const P=[];
+  function rafaga(x,y,ang,n){
+    for(let i=0;i<n;i++){
+      const a=ang+(Math.random()-.5)*1.1, v=(9+Math.random()*11)*dpr;
+      P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,w:(5+Math.random()*6)*dpr,h:(3+Math.random()*5)*dpr,
+        r:Math.random()*6.28,vr:(Math.random()-.5)*.4,c:cols[(Math.random()*cols.length)|0],
+        o:Math.random()<.3,life:0});
+    }
+  }
+  rafaga(W*.1,H*.75,-1.15,70); rafaga(W*.9,H*.75,-Math.PI+1.15,70);
+  setTimeout(()=>rafaga(W*.5,H*.55,-Math.PI/2,60),220);
+  let t0=performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.vy+=.32*dpr; p.vx*=.992; p.vy*=.992; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.life++;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.globalAlpha=Math.max(0,1-p.life/150); ctx.fillStyle=p.c;
+      if(p.o){ctx.beginPath();ctx.arc(0,0,p.w/2.2,0,6.28);ctx.fill();} else ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(t-t0<3400 && P.some(p=>p.life<150)) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
+
+/* Guardar / actualizar cliente al finalizar el pedido (no bloquea ni depende de la respuesta) */
+function guardarCliente(p){
+  try{
+    if(!p || !p.dni || !p.nombres) return;
+    fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',keepalive:true,
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({dni:p.dni,nombres:p.nombres,telefono:p.telefono})}).catch(()=>{});
+  }catch(e){}
+}
 
 (function(){
-  const dniEl = document.getElementById('dni');
-  const nomEl = document.getElementById('nombres');
-  const cache = {};            // dni -> nombre completo
-  let ctrl = null;             // para cancelar consultas anteriores
-  let autoRelleno = false;     // true si el nombre actual lo puso la consulta
+  const dniEl=document.getElementById('dni'), nomEl=document.getElementById('nombres'), telEl=document.getElementById('telefono');
+  const card=document.getElementById('bienvenida');
+  const cache={}; let ctrl=null, timer=null, vistoDni='';
+  const auto={nombres:false,telefono:false};
 
-  // Mensaje de estado debajo del campo DNI
-  const estado = document.createElement('div');
-  estado.style.cssText = 'font-size:12px;margin-top:4px;display:none';
+  const estado=document.createElement('div');
+  estado.className='dni-estado';
   dniEl.closest('.form-group').appendChild(estado);
-  function setEstado(txt, color){
-    estado.textContent = txt || '';
-    estado.style.color = color || 'var(--stone)';
-    estado.style.display = txt ? 'block' : 'none';
+  function setEstado(t,cls){estado.textContent=t||'';estado.className='dni-estado'+(cls?' '+cls:'')+(t?' on':'');}
+
+  const titulo=s=>(s||'').toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()).trim();
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function saludo(){const h=new Date().getHours();return h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';}
+  const frases=[
+    'Es un verdadero gusto tenerte por aquí otra vez.',
+    'Qué alegría que vuelvas; clientas como tú hacen que cada pieza valga la pena.',
+    'Gracias por confiar de nuevo en nuestro trabajo hecho a mano.',
+    'Eres de esas personas que hacen especial este taller. ¡Bienvenida de vuelta!',
+    'Nos encanta que regreses; tu cariño por el cuero artesanal nos inspira.'
+  ];
+  function mostrarBienvenida(d){
+    const nombre=titulo(d.nombres), primero=nombre.split(' ')[0]||'';
+    const frase=frases[(Math.random()*frases.length)|0];
+    const n=Number(d.pedidos)||1;
+    const badge=n>=2?'<span class="bv-badge">♥ Cliente frecuente · '+n+' pedidos</span>':'<span class="bv-badge">♥ Cliente de la casa</span>';
+    card.innerHTML='<div class="bv-av">'+esc(primero.charAt(0)||'♥')+'</div>'+
+      '<div class="bv-txt"><small>'+saludo()+'</small><b>¡Hola de nuevo, '+esc(primero)+'!</b><p>'+esc(frase)+'</p>'+badge+'</div>'+
+      '<button type="button" class="bv-x" aria-label="Cerrar">×</button>';
+    card.hidden=false; card.classList.remove('in'); void card.offsetWidth; card.classList.add('in');
+    card.querySelector('.bv-x').onclick=()=>{card.hidden=true;};
+  }
+  function ocultarBienvenida(){card.hidden=true;card.classList.remove('in');}
+
+  function rellenar(el,key,val){
+    if(!val) return;
+    if(el.value.trim() && !auto[key]) return;        // no pisar lo que el usuario escribió
+    el.value=val; auto[key]=true;
+    el.closest('.form-group').classList.remove('invalid');
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
   }
 
-  const titulo = s => (s||'').toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()).trim();
-
-  // La API puede devolver los datos planos o dentro de "data"; se contemplan ambos
-  function extraerNombre(json){
-    const d = (json && (json.data || json.result || json)) || {};
-    const completo = d.nombre_completo || d.nombreCompleto || d.full_name;
-    if (completo) return titulo(completo);
-    const nombres = d.nombres || d.nombre || d.name || '';
-    const ap = d.apellido_paterno || d.apellidoPaterno || d.paterno || '';
-    const am = d.apellido_materno || d.apellidoMaterno || d.materno || '';
-    return titulo([nombres, ap, am].filter(Boolean).join(' '));
+  function aplicar(d,dni){
+    if(!d.found){
+      ocultarBienvenida();
+      setEstado('Eres nueva por aquí ✨ Completa tus datos y te recordaremos la próxima vez.','nuevo');
+      return;
+    }
+    setEstado('');
+    rellenar(nomEl,'nombres',titulo(d.nombres));
+    rellenar(telEl,'telefono',d.telefono);
+    mostrarBienvenida(d);
+    if(vistoDni!==dni){vistoDni=dni;lanzarConfeti();}
   }
 
-  async function consultarDNI(dni){
-    if (APPS_SCRIPT_URL.indexOf('PEGA_AQUI') === 0) return;   // aún sin configurar
-    if (cache[dni]) { aplicar(cache[dni]); return; }
-    if (ctrl) ctrl.abort();
-    ctrl = new AbortController();
-    setEstado('Buscando DNI…');
+  async function consultar(dni){
+    if(cache[dni]){aplicar(cache[dni],dni);return;}
+    if(ctrl) ctrl.abort(); ctrl=new AbortController();
+    setEstado('Buscando tu perfil…','buscando');
     try{
-      const r = await fetch(APPS_SCRIPT_URL + '?dni=' + dni, { signal: ctrl.signal });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const j = await r.json();
-      if (!j || !j.ok) throw new Error((j && j.error) || 'sin datos');
-      const nombre = titulo(j.nombre);
-      cache[dni] = nombre;
-      aplicar(nombre);
+      const r=await fetch(APPS_SCRIPT_URL+'?dni='+dni,{signal:ctrl.signal});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      if(!j||!j.ok) throw new Error((j&&j.error)||'sin datos');
+      cache[dni]=j; aplicar(j,dni);
     }catch(e){
-      if (e.name === 'AbortError') return;
-      setEstado('No se pudo obtener el nombre. Escríbelo manualmente.', 'var(--error)');
+      if(e.name==='AbortError') return;
+      console.warn('Consulta de cliente falló:',e);
+      setEstado('','');           // fallo silencioso: el cliente simplemente llena sus datos
     }
   }
 
-  function aplicar(nombre){
-    // No pisar lo que el usuario escribió a mano
-    if (nomEl.value.trim() && !autoRelleno) { setEstado(''); return; }
-    nomEl.value = nombre;
-    autoRelleno = true;
-    nomEl.closest('.form-group').classList.remove('invalid');
-    setEstado('✓ Nombre completado desde RENIEC', 'var(--success, #2e7d32)');
-  }
-
-  dniEl.addEventListener('input', () => {
-    const dni = dniEl.value.replace(/\D/g, '');
-    if (dni !== dniEl.value) dniEl.value = dni;   // solo dígitos
-    if (dni.length === 8) {
-      consultarDNI(dni);                          // DNI = 8 dígitos; CE (9–11) no se consulta
-    } else {
-      if (ctrl) ctrl.abort();
-      setEstado('');
-      if (autoRelleno) { nomEl.value = ''; autoRelleno = false; }
+  dniEl.addEventListener('input',()=>{
+    const dni=dniEl.value.replace(/\D/g,'');
+    if(dni!==dniEl.value) dniEl.value=dni;
+    clearTimeout(timer);
+    if(dni.length>=8){ timer=setTimeout(()=>consultar(dni),dni.length===8?150:450); }
+    else{
+      if(ctrl) ctrl.abort();
+      setEstado(''); ocultarBienvenida(); vistoDni='';
+      if(auto.nombres){nomEl.value='';auto.nombres=false;}
+      if(auto.telefono){telEl.value='';auto.telefono=false;}
     }
   });
-
-  // Si el usuario edita el nombre manualmente, ya no se considera autocompletado
-  nomEl.addEventListener('input', () => { autoRelleno = false; });
+  nomEl.addEventListener('input',()=>{auto.nombres=false;});
+  telEl.addEventListener('input',()=>{auto.telefono=false;});
 })();
 </script>
 

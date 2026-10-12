@@ -358,6 +358,12 @@ h2{font-size:clamp(28px,4.5vw,38px);font-weight:600}
 #cPanel .cd p{margin:6px 0 0;color:var(--charcoal-soft);font-size:12.5px}
 #cPanel .cf{display:flex;gap:8px;padding:10px 14px 14px}
 #cPanel .cf button{flex:1;justify-content:center}
+.mascot[data-mood="curious"] .k-curious{display:inline}
+.mascot .pup{transform:translate(calc(var(--px,0)*1px),calc(var(--py,0)*1px));transition:transform .18s ease-out}
+.mascot[data-mood="curious"] .rig{animation:mCurious 2.6s ease-in-out infinite}
+.mascot[data-anim="peek"] .rig{animation:mPeek .38s var(--ease)}
+@keyframes mCurious{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg) translateY(-2px)}}
+@keyframes mPeek{40%{transform:translateY(-7px) rotate(7deg) scale(1.06)}}
 </style>
 </head>
 <body>
@@ -1282,20 +1288,21 @@ function guardarCliente(p){
   function aplicar(d,dni){
     if(!d.found){
       ocultarBienvenida();
-      setEstado('Eres nueva por aquí ✨ Completa tus datos y te recordaremos la próxima vez.','nuevo');
+      setEstado('Eres nueva por aquí ✨ Completa tus datos y te recordaremos la próxima vez.','nuevo');window.cariEvent&&cariEvent('new');
       return;
     }
     setEstado('');
     rellenar(nomEl,'nombres',titulo(d.nombres));
     rellenar(telEl,'telefono',d.telefono);
     mostrarBienvenida(d);
+    window.cariEvent&&cariEvent('found',{nombre:titulo(d.nombres).split(' ')[0],n:Number(d.pedidos)||1});
     if(vistoDni!==dni){vistoDni=dni;lanzarConfeti();}
   }
 
   async function consultar(dni){
     if(cache[dni]){aplicar(cache[dni],dni);return;}
     if(ctrl) ctrl.abort(); ctrl=new AbortController();
-    setEstado('Buscando tu perfil…','buscando');
+    setEstado('Buscando tu perfil…','buscando');window.cariEvent&&cariEvent('search');
     try{
       const r=await fetch(APPS_SCRIPT_URL+'?dni='+dni,{signal:ctrl.signal});
       if(!r.ok) throw new Error('HTTP '+r.status);
@@ -1304,7 +1311,7 @@ function guardarCliente(p){
       cache[dni]=j; aplicar(j,dni);
     }catch(e){
       if(e.name==='AbortError') return;
-      console.warn('Consulta de cliente falló:',e);
+      console.warn('Consulta de cliente falló:',e);window.cariEvent&&cariEvent('error');
       setEstado('','');           // fallo silencioso: el cliente simplemente llena sus datos
     }
   }
@@ -1405,6 +1412,7 @@ function svgFor(h){
 const c=h?{ink:'#0d0f12',line:'#c8e23a',mf:'#0d0f12',ms:'#c8e23a',fy:60,sh:'#000'}:{ink:'#2d3516',line:'#2d3516',mf:'#2d3516',ms:'#2d3516',fy:70,sh:'#2d3516'};
 const eyeO=x=>'<circle cx="'+x+'" cy="0" r="5.4" fill="#fff"/><circle cx="'+(x+.6)+'" cy=".6" r="3.1" fill="'+c.ink+'"/><circle cx="'+(x+1.7)+'" cy="-.7" r="1.1" fill="#fff"/>';
 const eyeW=x=>'<circle cx="'+x+'" cy="0" r="6.3" fill="#fff" stroke="'+c.ink+'" stroke-width="1.2"/><circle cx="'+x+'" cy="0" r="2.4" fill="'+c.ink+'"/><circle cx="'+(x+1)+'" cy="-1" r=".9" fill="#fff"/>';
+const eyeC=x=>'<circle cx="'+x+'" cy="0" r="6" fill="#fff" stroke="'+c.ink+'" stroke-width="1"/><g class="pup"><circle cx="'+x+'" cy="0" r="3" fill="'+c.ink+'"/><circle cx="'+(x+1)+'" cy="-1" r="1" fill="#fff"/></g>';
 const arc=(x,d)=>'<path d="M'+(x-5.5)+' '+(d?-1:2.5)+'Q'+x+' '+(d?4:-5)+' '+(x+5.5)+' '+(d?-1:2.5)+'" stroke="'+c.line+'" stroke-width="3" fill="none"/>';
 const heart=x=>'<g transform="translate('+x+' 0)"><path class="hb" d="M0 3.5C-7-1.5-5-8-2.2-8C-.8-8 0-7 0-6C0-7 .8-8 2.2-8C5-8 7-1.5 0 3.5Z" fill="#ff5f87"/></g>';
 const big='<path d="M43 7Q50 21 57 7Z" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width="1" fill-opacity="1"/><ellipse cx="50" cy="12" rx="3" ry="1.9" fill="#ff7f9d"/>';
@@ -1416,6 +1424,7 @@ const face='<g transform="translate(0 '+c.fy+')">'+
 '<g class="p k-love">'+heart(36)+heart(64)+cat+'</g>'+
 '<g class="p k-wow">'+eyeW(36)+eyeW(64)+'<ellipse cx="50" cy="10.5" rx="3.2" ry="4.2" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width="1"/></g>'+
 '<g class="p k-wink">'+eyeO(36)+arc(64)+cat+'</g>'+
+'<g class="p k-curious">'+eyeC(36)+eyeC(64)+'<path d="M29 -9.5Q35 -14 42 -10" stroke="'+c.line+'" stroke-width="2.2" fill="none"/><path d="M58 -9.5Q64 -11 70 -8.5" stroke="'+c.line+'" stroke-width="2.2" fill="none"/><ellipse cx="50" cy="11" rx="2.6" ry="3.3" fill="'+c.mf+'"/></g>'+
 '<g class="p k-sleep">'+arc(36,1)+arc(64,1)+'<ellipse class="snore" cx="50" cy="10" rx="2.2" ry="1.7" fill="'+c.mf+'" stroke="'+c.ms+'" stroke-width=".8"/></g>'+
 '</g>';
 const emb=(x,y,s,col,w)=>'<path d="'+INF+'" transform="translate('+x+' '+y+') scale('+s+')" stroke="'+col+'" stroke-width="'+w+'" fill="none"/>';
@@ -1438,7 +1447,7 @@ return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="
 '<circle cx="50" cy="55" r="6.5" fill="#c9a24b" stroke="#f3f5e6" stroke-width="1.2"/>'+emb(50,55,.55,'#fff',2.4)+face+
 '<g transform="rotate(12 10 68)"><ellipse class="arm arm-l" cx="10" cy="68" rx="5.5" ry="9" fill="#8aa02a"/></g>'+
 '<g transform="rotate(-12 90 68)"><ellipse class="arm arm-r" cx="90" cy="68" rx="5.5" ry="9" fill="#8aa02a"/></g></svg>'}
-const GL={happy:['✦','★','∞'],love:['♥','♥','✦'],wink:['★','✦'],wow:['!','✦','!'],dance:['♪','♫','✦'],sleep:['z','Z','z']};
+const GL={curious:['?','…','?'],happy:['✦','★','∞'],love:['♥','♥','✦'],wink:['★','✦'],wow:['!','✦','!'],dance:['♪','♫','✦'],sleep:['z','Z','z']};
 const DUR={happy:1900,love:2500,wink:1900,wow:1900,dance:3100};
 const $=id=>document.getElementById(id);
 const W=()=>document.documentElement.clientWidth,H=()=>innerHeight;
@@ -1475,7 +1484,7 @@ const save=()=>{const s=SZ();S.fx=(S.x-4)/Math.max(1,W()-s-8);S.fy=(S.y-4)/Math.
 const mood=m=>{root.dataset.mood=m};
 const anim=a=>{root.dataset.anim='';void root.offsetWidth;root.dataset.anim=a};
 let tBub=0,tRev=0,iZ=0,tSleep=0;
-function say(t,ms){clearTimeout(tBub);bub.textContent=t;bub.classList.toggle('below',S.y<90);bub.style.setProperty('--bx','0px');
+function say(t,ms){clearTimeout(tBub);bub.textContent=t;bub.classList.toggle('sum',t.length>60);bub.classList.toggle('below',S.peek?!!S.peekBelow:S.y<90);bub.style.setProperty('--bx','0px');
 const bw=bub.offsetWidth,c=S.x+SZ()/2,l=c-bw/2;let bx=0;if(l<8)bx=8-l;else if(l+bw>W()-8)bx=W()-8-(l+bw);bub.style.setProperty('--bx',bx+'px');
 bub.classList.add('show');tBub=setTimeout(()=>bub.classList.remove('show'),ms||3200)}
 function burst(m,n){const cols=['#a3b52c','#657c1c','#c9a24b','#8aa02a'],gl=GL[m]||GL.happy,up=S.y>=70;
@@ -1483,9 +1492,9 @@ for(let i=0;i<n;i++){const s=document.createElement('span'),g=gl[i%gl.length];s.
 s.style.setProperty('--dx',((Math.random()*2-1)*38)+'px');s.style.setProperty('--dy',((up?-1:1)*(28+Math.random()*34))+'px');s.style.setProperty('--rt',((Math.random()*2-1)*40)+'deg');
 s.style.left=(30+Math.random()*40)+'%';s.style.top=up?'30%':'70%';s.style.animationDelay=(i*60)+'ms';s.style.fontSize=(.8+Math.random()*.6)+'rem';fx.appendChild(s);setTimeout(()=>s.remove(),1700+i*60)}}
 function react(m,text,ms){clearTimeout(tRev);mood(m);anim(m);if(text)say(text,ms);burst(m,m==='dance'?8:5);
-tRev=setTimeout(()=>{if(!S.sleeping&&!S.drag){mood('idle');root.dataset.anim=''}},DUR[m]||1900)}
+tRev=setTimeout(()=>{if(!S.sleeping&&!S.drag){mood(S.peek?'curious':'idle');root.dataset.anim=''}},DUR[m]||1900)}
 const sleepTimer=()=>{clearTimeout(tSleep);tSleep=setTimeout(goSleep,55000)};
-function goSleep(){if(S.drag||S.open)return;S.sleeping=true;clearTimeout(tRev);mood('sleep');root.dataset.anim='';say('Zzz…',1800);burst('sleep',2);clearInterval(iZ);iZ=setInterval(()=>burst('sleep',2),2600)}
+function goSleep(){if(S.drag||S.open||S.peek)return;S.sleeping=true;clearTimeout(tRev);mood('sleep');root.dataset.anim='';say('Zzz…',1800);burst('sleep',2);clearInterval(iZ);iZ=setInterval(()=>burst('sleep',2),2600)}
 function wake(){clearInterval(iZ);if(S.sleeping){S.sleeping=false;mood('idle')}sleepTimer()}
 const tip=(t,m)=>{if(S.open||S.drag)return;S.sleeping&&wake();react(m||'happy',t,4200)};
 window.cariSay=tip;
@@ -1513,7 +1522,7 @@ faq:()=>bubble('Las dudas más comunes ❓')+[['¿Puedo corregir mis datos?','S�
 function go(v){S.view=v;body.innerHTML=(VIEWS[v]||VIEWS.menu)();body.scrollTop=0}
 function dock(){const r=panel.getBoundingClientRect(),s=SZ();S.saved={x:S.x,y:S.y};root.classList.add('mv');
 S.x=Math.min(W()-s-8,r.right-s-4);S.y=r.top-s-2;if(S.y<4){S.x=Math.max(4,r.left-s-6);S.y=Math.max(4,H()-s-12)}clamp();apply();setTimeout(()=>root.classList.remove('mv'),600)}
-function openP(v){S.open=true;wake();bub.classList.remove('show');go(v||'menu');panel.classList.add('on');root.classList.add('opened');$('cQ').style.display='none';requestAnimationFrame(dock);react('happy')}
+function openP(v){endPeek(true);S.open=true;wake();bub.classList.remove('show');go(v||'menu');panel.classList.add('on');root.classList.add('opened');$('cQ').style.display='none';requestAnimationFrame(dock);react('happy')}
 function closeP(){if(!S.open)return;S.open=false;panel.classList.remove('on');if(S.saved){root.classList.add('mv');S.x=S.saved.x;S.y=S.saved.y;clamp();apply();setTimeout(()=>root.classList.remove('mv'),600);S.saved=null}}
 window.cariOpen=openP;window.cariClose=closeP;
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-go],[data-a]');if(!b)return;
@@ -1530,7 +1539,7 @@ else{if(s==='sd'){S.sh={d:v,p:'',z:''}}else if(s==='sp'){S.sh.p=v;S.sh.z=''}else
 let down=false,moved=false,sx=0,sy=0,ox=0,oy=0,pid=0;
 root.addEventListener('pointerdown',e=>{if(e.button>0)return;down=true;moved=false;sx=e.clientX;sy=e.clientY;ox=S.x;oy=S.y;pid=e.pointerId;try{root.setPointerCapture(pid)}catch(_){}});
 root.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-sx,dy=e.clientY-sy;
-if(!moved&&Math.hypot(dx,dy)>6){moved=true;S.drag=true;wake();clearTimeout(tRev);root.classList.add('drag');root.dataset.anim='';mood('happy');bub.classList.remove('show')}
+if(!moved&&Math.hypot(dx,dy)>6){moved=true;S.drag=true;S.peek=null;S.pk=null;wake();clearTimeout(tRev);root.classList.add('drag');root.dataset.anim='';mood('happy');bub.classList.remove('show')}
 if(moved){S.x=ox+dx;S.y=oy+dy;clamp();apply()}});
 function up(e){if(!down)return;down=false;try{root.releasePointerCapture(pid)}catch(_){}
 if(moved){S.drag=false;root.classList.remove('drag');mood('idle');anim('land');save();burst('happy',3)}
@@ -1539,12 +1548,48 @@ root.addEventListener('pointerup',up);root.addEventListener('pointercancel',up);
 root.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();S.open?closeP():openP();return}
 if(e.key==='Escape')closeP();const d={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]}[e.key];if(d){e.preventDefault();S.x+=d[0];S.y+=d[1];clamp();apply();save()}});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
-addEventListener('resize',()=>{fromFrac();if(S.open)dock()});
+addEventListener('resize',()=>{fromFrac();if(S.open)dock();peekUpdate()});
 const act=()=>{S.act=Date.now();if(S.sleeping)wake();else sleepTimer()};
 ['pointerdown','keydown','touchstart','wheel','scroll'].forEach(ev=>addEventListener(ev,act,{passive:true}));
-setInterval(()=>{const n=Date.now();if(S.sleeping||S.drag||S.open||down||n-S.act<9000||n-S.lastIdle<11000||bub.classList.contains('show'))return;
+setInterval(()=>{const n=Date.now();if(S.sleeping||S.drag||S.open||S.peek||down||n-S.act<9000||n-S.lastIdle<11000||bub.classList.contains('show'))return;
 S.lastIdle=n;let t;do{t=pick(IDLE)}while(t===S.lastMsg);S.lastMsg=t;react(pick(['happy','love','wink','dance']),t,3800)},1000);
 setInterval(()=>{if(root.dataset.mood==='idle'&&!S.drag&&!S.sleeping&&Math.random()<.6){mood('wink');setTimeout(()=>{if(root.dataset.mood==='wink'&&!S.drag&&!S.sleeping)mood('idle')},1100)}},15000);
+/* ---------- Curiosa: husmea lo que escribes ---------- */
+const FIELDS='#pedidoForm input[type=text],#pedidoForm input[type=tel],#pedidoForm input:not([type]),#pedidoForm textarea';
+const PEEK=['¡Ooh, sigue, sigue! 👀','Mmm… interesante 🧐','No miro, ¡solo soy curiosa! 🙈','¡Qué bien escribes! ✨'];
+const cvm=document.createElement('canvas').getContext('2d');
+function look(el){const r=el.getBoundingClientRect(),s=SZ(),cs=getComputedStyle(el);let tx=r.left+r.width*.5;
+try{if(el.tagName==='INPUT'){cvm.font=cs.font;const w=cvm.measureText(el.value||'').width,pl=parseFloat(cs.paddingLeft)||12;tx=r.left+pl+Math.min(w,r.width-2*pl)}}catch(e){}
+const ty=r.top+r.height/2,ex=S.x+s/2,ey=S.y+s*.7,dx=tx-ex,dy=ty-ey,d=Math.hypot(dx,dy)||1,k=Math.min(1,d/50)*2.7;
+root.style.setProperty('--px',(dx/d*k).toFixed(2));root.style.setProperty('--py',(dy/d*k).toFixed(2))}
+function peekUpdate(){const el=S.peek;if(!el||S.open||S.drag)return;const r=el.getBoundingClientRect(),s=SZ();if(r.bottom<0||r.top>H())return;
+let x=Math.min(W()-s-6,r.right-s-10),y=r.top-s*.78;S.peekBelow=false;if(y<4){y=r.bottom-s*.2;S.peekBelow=true}
+S.x=x;S.y=y;clamp();apply();look(el)}
+function startPeek(el){if(S.open||S.drag)return;if(!S.pk&&!S.peek)S.pk={x:S.x,y:S.y};S.peek=el;wake();clearTimeout(tRev);bub.classList.remove('show');mood('curious');root.dataset.anim='';
+root.classList.add('mv');peekUpdate();setTimeout(()=>root.classList.remove('mv'),650);burst('curious',3)}
+function endPeek(){const was=S.peek;S.peek=null;S.peekBelow=false;root.style.setProperty('--px',0);root.style.setProperty('--py',0);
+if(S.pk){if(!S.open&&!S.drag){root.classList.add('mv');S.x=S.pk.x;S.y=S.pk.y;clamp();apply();setTimeout(()=>root.classList.remove('mv'),650)}S.pk=null}
+if(was&&!S.drag&&!S.sleeping)mood('idle')}
+document.addEventListener('focusin',e=>{if(e.target.matches&&e.target.matches(FIELDS))startPeek(e.target)});
+document.addEventListener('focusout',()=>{if(!S.peek)return;setTimeout(()=>{const a=document.activeElement;if(a&&a.matches&&a.matches(FIELDS))return;endPeek()},350)});
+let tPk=0,tChat=0;
+const onKey=e=>{if(!S.peek||e.target!==S.peek)return;look(S.peek);const n=Date.now();
+if(n-tPk>180&&!S.drag&&root.dataset.mood==='curious'){tPk=n;root.dataset.anim='';void root.offsetWidth;root.dataset.anim='peek';setTimeout(()=>{if(root.dataset.anim==='peek')root.dataset.anim=''},400)}
+if(n-tChat>11000&&Math.random()<.12){tChat=n;say(pick(PEEK),2600)}};
+document.addEventListener('input',onKey);document.addEventListener('keyup',onKey);
+document.addEventListener('click',e=>{if(S.peek&&e.target===S.peek)look(S.peek)});
+const pu=()=>requestAnimationFrame(peekUpdate);addEventListener('scroll',pu,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',pu);
+setInterval(peekUpdate,400);
+/* ---------- Búsqueda de DNI ---------- */
+let iS=0,tS=0;
+const stopS=()=>{clearInterval(iS);clearTimeout(tS);iS=0};
+const hi=()=>{const h=new Date().getHours();return h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches'};
+window.cariEvent=(t,d)=>{if(!S||S.open)return;
+if(t==='search'){stopS();wake();clearTimeout(tRev);mood('curious');say('Mmm… déjame buscar tu perfil 🔍',3000);burst('curious',3);iS=setInterval(()=>burst('curious',2),1400);tS=setTimeout(()=>{stopS();if(!S.sleeping&&!S.drag)mood(S.peek?'curious':'idle')},12000);return}
+stopS();wake();
+if(t==='found'){react('dance','¡'+hi()+', '+d.nombre+'! 💚 ¡Qué alegría verte de nuevo!'+(d.n>=2?' Ya son '+d.n+' pedidos contigo ♥':''),5600);burst('love',8)}
+else if(t==='new'){react('dance','¡Hola, qué alegría tenerte aquí por primera vez! 🎉 ¡Ingresa tus datos y te recordaremos la próxima vez! ✨',6200);burst('happy',10)}
+else mood(S.peek?'curious':'idle')};
 /* ---------- Contexto de la página ---------- */
 document.addEventListener('focusin',e=>{const id=e.target&&e.target.id,t=TIPS[id];if(!t)return;const n=Date.now();if(id===S.lastTip&&n-S.lastTipT<20000)return;S.lastTip=id;S.lastTipT=n;tip(t,'wink')});
 $('zona').addEventListener('change',()=>{if(tipoEnvioSeleccionado!==2)return;const d=preciosMotorizado.find(x=>x.distrito===$('zona').value);if(d)tip(d.precio==null?'Ese distrito requiere consultar el precio. Escríbele a Rut 💬':'Envío a '+d.distrito+': '+price(d)+' 🛵','wow')});

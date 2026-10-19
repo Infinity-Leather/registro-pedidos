@@ -772,8 +772,12 @@ transform-origin:calc(50% - var(--bx,0px)) calc(100% + 10px);transform:translate
         <span>♥ Calidad garantizada</span><span>♥ Hecho con pasión</span><span>♥ Empaque seguro</span>
       </div>
       <div class="actions" style="justify-content:center">
-        <button type="button" class="btn btn-ghost" onclick="volverAEditar()">← Modificar</button>
-        <button type="button" class="btn btn-primary" onclick="enviarPedidoWhatsApp()">Enviar pedido</button>
+        <button type="button" class="btn btn-ghost" id="btnModificar" onclick="volverAEditar()">← Modificar</button>
+        <button type="button" class="btn btn-primary" id="btnEnviarPedido" onclick="enviarPedidoWhatsApp()">Enviar pedido</button>
+      </div>
+      <div class="notice-box" id="avisoEnviado" hidden style="margin-top:14px;text-align:left">
+        ✅ <strong>Pedido enviado · N° <span id="codigoPedido"></span></strong><br>
+        Tu pedido quedó registrado y ya no se puede modificar desde aquí. Si necesitas corregir algo, escríbenos por WhatsApp indicando tu número de pedido.
       </div>
     </div>
   </div>
@@ -1312,6 +1316,7 @@ function confirmarPedido(){
 
 /* ===== Volver a editar (desde el resumen) ===== */
 function volverAEditar(){
+  if(ultimoPedido && ultimoPedido.enviado) return;   // pedido ya enviado: bloqueado
   document.getElementById('panelGracias').hidden=true;
   document.getElementById('panelFormulario').hidden=false;
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1327,7 +1332,9 @@ function construirMensajeWhatsApp(p){
   };
 
   let msg='';
-  msg+='*Nuevo pedido — Infinity Leather*\n\n';
+  msg+='*Nuevo pedido — Infinity Leather*\n';
+  if(p.codigo) msg+='Pedido N°: *'+p.codigo+'*\n';
+  msg+='\n';
   msg+='Tipo de envío: *'+String(p.tipo||'').toUpperCase()+'*\n';
   msg+=linea('DNI - CE', p.dni);
   msg+=linea('Cliente', p.nombres);
@@ -1343,12 +1350,40 @@ function construirMensajeWhatsApp(p){
   msg+=linea('Fecha', p.fecha);
   msg+=linea('Horario', p.horario);
   msg+=linea('Costo de envío', p.precioTexto);
+  if(p.codigo) msg+='\nVerificar pedido original: '+APPS_SCRIPT_URL+'?ver='+p.codigo+'\n';
   return msg;
+}
+
+/* Código único de pedido, p. ej. IL-251018-4F7K */
+function generarCodigoPedido(){
+  const d=new Date(), pad=n=>String(n).padStart(2,'0');
+  const abc='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r='';
+  const rnd=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(4)):[0,0,0,0].map(()=>Math.random()*256|0);
+  for(let i=0;i<4;i++) r+=abc[rnd[i]%abc.length];
+  return 'IL-'+String(d.getFullYear()).slice(2)+pad(d.getMonth()+1)+pad(d.getDate())+'-'+r;
+}
+
+/* Bloquea el resumen: ya no se puede volver a editar */
+function bloquearPedido(codigo){
+  const mod=document.getElementById('btnModificar');
+  if(mod) mod.hidden=true;
+  const env=document.getElementById('btnEnviarPedido');
+  if(env) env.textContent='Abrir WhatsApp de nuevo';
+  document.getElementById('codigoPedido').textContent=codigo;
+  document.getElementById('avisoEnviado').hidden=false;
+  const alerta=document.querySelector('#panelGracias .alert-box');
+  if(alerta) alerta.hidden=true;
 }
 
 function enviarPedidoWhatsApp(){
   if(!ultimoPedido) return;
-  guardarCliente(ultimoPedido);
+  if(!ultimoPedido.enviado){
+    ultimoPedido.codigo=generarCodigoPedido();
+    ultimoPedido.enviado=true;
+    guardarPedido(ultimoPedido);          // registro oficial en Google Sheets
+    bloquearPedido(ultimoPedido.codigo);
+  }
   const mensaje=construirMensajeWhatsApp(ultimoPedido);
   const url='https://wa.me/'+WHATSAPP_DESTINO+'?text='+encodeURIComponent(mensaje);
   window.open(url, '_blank');
@@ -1358,7 +1393,7 @@ function enviarPedidoWhatsApp(){
 document.getElementById('lugarEntrega').addEventListener('change', onLugarEntregaChange);
 
 /* ===== Clientes frecuentes: búsqueda por DNI/CE en Google Sheets (vía Apps Script) ===== */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx53WmI47KuVDDFiAxiw_ZSK0HCnmz473bhirsJK13wtTCQyi07hTzzSbSiAx08OTUmFg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzoXAaUsb3y5iq5nxYfseu37DredWrbn3rU0LVMVQpAjrmDeKppvJYX0IS3ncHFWMsA/exec';
 
 /* Confeti ligero (canvas, sin librerías) */
 function lanzarConfeti(){
@@ -1394,13 +1429,17 @@ function lanzarConfeti(){
   })(t0);
 }
 
-/* Guardar / actualizar cliente al finalizar el pedido (no bloquea ni depende de la respuesta) */
-function guardarCliente(p){
+/* Guarda el pedido completo en la pestaña "pedidos" y actualiza el cliente (no bloquea la página) */
+function guardarPedido(p){
   try{
-    if(!p || !p.dni || !p.nombres) return;
+    if(!p || !p.codigo) return;
+    const datos={accion:'pedido',codigo:p.codigo,tipo:p.tipo,dni:p.dni,nombres:p.nombres,telefono:p.telefono,
+      departamento:p.departamento,provincia:p.provincia,zona:p.zonaText,lugarEntrega:p.lugarEntregaText,
+      transporte:p.tipoTransporteShalom,direccion:p.direccion,referencia:p.referencia,maps:p.ubicacionMaps,
+      fecha:p.fecha,horario:p.horario,costo:p.precioTexto};
     fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',keepalive:true,
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({dni:p.dni,nombres:p.nombres,telefono:p.telefono})}).catch(()=>{});
+      body:JSON.stringify(datos)}).catch(()=>{});
   }catch(e){}
 }
 

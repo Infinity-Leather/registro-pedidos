@@ -525,6 +525,18 @@ transform-origin:calc(50% - var(--bx,0px)) calc(100% + 10px);transform:translate
 @media(max-width:600px){#cari .mb{font-size:.74rem;padding:7px 11px 10px}}
 @media (prefers-reduced-motion:reduce){.mbx .w{opacity:1;transform:none;filter:none}.ibg *{animation:none!important}}
 </style>
+<style id="invitacionCss">
+#bloqueoInv{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px;
+  background:radial-gradient(900px 500px at 0% -5%,#e6ecd0,transparent 60%),var(--bg)}
+#bloqueoInv[hidden]{display:none}
+#bloqueoInv .bi{max-width:420px;width:100%;background:#fff;border:1px solid var(--border);border-radius:22px;padding:28px 22px;text-align:center;box-shadow:var(--shadow-lg)}
+#bloqueoInv .bi-ic{font-size:40px;margin-bottom:6px}
+#bloqueoInv h1{font:600 22px 'Bodoni Moda',Georgia,serif;color:var(--olive-dark);margin-bottom:8px}
+#bloqueoInv p{font-size:14px;color:var(--charcoal-soft);line-height:1.5;margin-bottom:18px}
+#bloqueoInv .btn{width:100%}
+#bloqueoInv .bi-spin{width:34px;height:34px;margin:6px auto 14px;border:3px solid var(--olive-pale);border-top-color:var(--olive);border-radius:50%;animation:bvspin .8s linear infinite}
+body:has(#bloqueoInv:not([hidden])) #cari,body:has(#bloqueoInv:not([hidden])) #cPanel{display:none!important}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><path id="ilem" pathLength="1000" d="M20 100C20 20 110 20 150 100S280 180 280 100 190 20 150 100 20 180 20 100Z"/></defs></svg>
@@ -533,6 +545,16 @@ transform-origin:calc(50% - var(--bx,0px)) calc(100% + 10px);transform:translate
 <div class="stitch-frame" aria-hidden="true"></div>
 <div class="deco-wrap" aria-hidden="true">
   <span class="deco">✦</span><span class="deco">♥</span><span class="deco">✦</span><span class="deco">♥</span><span class="deco">✦</span>
+</div>
+
+<div id="bloqueoInv" role="alertdialog" aria-live="polite">
+  <div class="bi">
+    <div class="bi-spin" id="biSpin"></div>
+    <div class="bi-ic" id="biIcono" hidden>🔒</div>
+    <h1 id="biTitulo">Verificando tu enlace…</h1>
+    <p id="biTexto">Un momento, por favor.</p>
+    <button type="button" class="btn btn-primary" id="biBoton" hidden></button>
+  </div>
 </div>
 
 <div class="page">
@@ -673,7 +695,7 @@ transform-origin:calc(50% - var(--bx,0px)) calc(100% + 10px);transform:translate
           <div class="form-group" id="grupoFechaRecojo" hidden>
             <label for="fechaRecojo">Fecha de recojo</label>
             <input type="date" id="fechaRecojo">
-            <div class="field-error">La fecha no puede ser anterior a hoy</div>
+            <div class="field-error">Antes de las 8:00 pm puedes elegir hoy; después, desde mañana</div>
           </div>
 
           <!-- Horario recojo -->
@@ -734,7 +756,7 @@ transform-origin:calc(50% - var(--bx,0px)) calc(100% + 10px);transform:translate
           <div class="form-group full" id="grupoFechaShalom" hidden>
             <label for="fechaShalom">Fecha de envío</label>
             <input type="date" id="fechaShalom">
-            <div class="field-error">La fecha no puede ser anterior a hoy</div>
+            <div class="field-error">Antes de las 5:00 pm puedes elegir hoy; después, desde mañana</div>
           </div>
 
           <!-- Precio motorizado -->
@@ -843,6 +865,14 @@ function formatearFechaLocal(d){
 }
 function getHoy(){return formatearFechaLocal(new Date())}
 function getManana(){const h=new Date();h.setDate(h.getDate()+1);return formatearFechaLocal(h)}
+/* Fecha mínima según una hora de corte: desde esa hora ya no se puede elegir hoy */
+function minFechaCorte(hora){
+  const ahora=new Date(), corte=new Date();
+  corte.setHours(hora,0,0,0);
+  return ahora<corte ? getHoy() : getManana();
+}
+function getMinFechaRecojo(){ return minFechaCorte(20); }   // desde las 8:00 pm → mañana
+function getMinFechaShalom(){ return minFechaCorte(17); }   // desde las 5:00 pm → mañana
 function getMinFechaMotorizado(){
   // Única condición: a partir de las 8:00am ya no se puede elegir hoy,
   // solo fechas posteriores a hoy. Antes de las 8:00am, sí se puede elegir hoy.
@@ -1087,7 +1117,7 @@ function continuarEnvio(){
   // Fechas
   if(c.fechaRecojo){
     const fr=document.getElementById('fechaRecojo');
-    fr.min=getHoy(); fr.value=getHoy();
+    fr.min=getMinFechaRecojo(); fr.value=getMinFechaRecojo();
   }
   if(c.fechaM){
     const fm=document.getElementById('fechaMotorizado');
@@ -1099,7 +1129,7 @@ function continuarEnvio(){
   }
   if(c.fechaShalom){
     const fs=document.getElementById('fechaShalom');
-    fs.min=getHoy(); fs.value=getHoy();
+    fs.min=getMinFechaShalom(); fs.value=getMinFechaShalom();
   }
   if(c.tipoTransporte){
     tipoTransporteShalom='terrestre';
@@ -1182,7 +1212,7 @@ function validar(){
   // Fecha recojo (>= hoy)
   if(!document.getElementById('grupoFechaRecojo').hidden){
     const f=document.getElementById('fechaRecojo').value;
-    if(!f || f<getHoy()) invalidar('fechaRecojo');
+    if(!f || f<getMinFechaRecojo()) invalidar('fechaRecojo');
   }
 
   // Horario recojo
@@ -1202,7 +1232,7 @@ function validar(){
   // Fecha Shalom (>= hoy)
   if(!document.getElementById('grupoFechaShalom').hidden){
     const f=document.getElementById('fechaShalom').value;
-    if(!f || f<getHoy()) invalidar('fechaShalom');
+    if(!f || f<getMinFechaShalom()) invalidar('fechaShalom');
   }
 
   // Fecha express (>= hoy)
@@ -1393,7 +1423,54 @@ function enviarPedidoWhatsApp(){
 document.getElementById('lugarEntrega').addEventListener('change', onLugarEntregaChange);
 
 /* ===== Clientes frecuentes: búsqueda por DNI/CE en Google Sheets (vía Apps Script) ===== */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzoXAaUsb3y5iq5nxYfseu37DredWrbn3rU0LVMVQpAjrmDeKppvJYX0IS3ncHFWMsA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKGQvl8hQ2A6p9A9xv0e197Blusb2hkDuLoNI6V6OYAVQOWK_tLuPGOLjMHmNpPIWiUg/exec';
+
+/* ===== Acceso solo con enlace de invitación (…/index.html?inv=CODIGO) ===== */
+const INVITACION=(new URLSearchParams(location.search).get('inv')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+function mostrarBloqueo(icono,titulo,texto,boton,accion){
+  const b=document.getElementById('bloqueoInv');
+  document.getElementById('biSpin').hidden=true;
+  const ic=document.getElementById('biIcono'); ic.hidden=false; ic.textContent=icono;
+  document.getElementById('biTitulo').textContent=titulo;
+  document.getElementById('biTexto').textContent=texto;
+  const bt=document.getElementById('biBoton'); bt.hidden=!boton; bt.textContent=boton||''; bt.onclick=accion||null;
+  b.hidden=false;
+}
+function pedirEnlace(){
+  window.open('https://wa.me/'+WHATSAPP_DESTINO+'?text='+encodeURIComponent('Hola Rut 💚 Quisiera mi enlace para registrar mi pedido.'),'_blank');
+}
+async function verificarInvitacion(){
+  const b=document.getElementById('bloqueoInv');
+  if(!INVITACION){
+    mostrarBloqueo('🔒','Necesitas tu enlace personal','Para registrar tu pedido usa el enlace que te enviamos por WhatsApp. Si aún no lo tienes, pídelo aquí.','💬 Pedir mi enlace',pedirEnlace);
+    return;
+  }
+  document.getElementById('biSpin').hidden=false; document.getElementById('biIcono').hidden=true;
+  document.getElementById('biTitulo').textContent='Verificando tu enlace…';
+  document.getElementById('biTexto').textContent='Un momento, por favor.';
+  document.getElementById('biBoton').hidden=true; b.hidden=false;
+  try{
+    const r=await fetch(APPS_SCRIPT_URL+'?inv='+encodeURIComponent(INVITACION));
+    const j=await r.json();
+    if(j && j.ok && j.valido){
+      b.hidden=true;
+      const tel=document.getElementById('telefono');
+      if(j.telefono && tel && !tel.value) tel.value=j.telefono;
+      return;
+    }
+    const m=(j&&j.motivo)||'';
+    const textos={
+      usado:['✅','Este enlace ya fue usado','Tu pedido ya fue registrado con este enlace. Si necesitas hacer otro pedido o corregir algo, escríbenos.'],
+      vencido:['⏰','Este enlace venció','Pide un enlace nuevo por WhatsApp y te lo enviamos al momento.'],
+      anulado:['🚫','Este enlace fue anulado','Pide un enlace nuevo por WhatsApp.']
+    };
+    const t=textos[m]||['🔒','Enlace no válido','Revisa que hayas abierto el enlace completo que te enviamos, o pide uno nuevo.'];
+    mostrarBloqueo(t[0],t[1],t[2],'💬 Escribir por WhatsApp',pedirEnlace);
+  }catch(e){
+    mostrarBloqueo('📶','No pudimos verificar tu enlace','Revisa tu conexión a internet e inténtalo otra vez.','Reintentar',verificarInvitacion);
+  }
+}
+verificarInvitacion();
 
 /* Confeti ligero (canvas, sin librerías) */
 function lanzarConfeti(){
@@ -1436,7 +1513,7 @@ function guardarPedido(p){
     const datos={accion:'pedido',codigo:p.codigo,tipo:p.tipo,dni:p.dni,nombres:p.nombres,telefono:p.telefono,
       departamento:p.departamento,provincia:p.provincia,zona:p.zonaText,lugarEntrega:p.lugarEntregaText,
       transporte:p.tipoTransporteShalom,direccion:p.direccion,referencia:p.referencia,maps:p.ubicacionMaps,
-      fecha:p.fecha,horario:p.horario,costo:p.precioTexto};
+      fecha:p.fecha,horario:p.horario,costo:p.precioTexto,inv:INVITACION};
     fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',keepalive:true,
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify(datos)}).catch(()=>{});
@@ -1505,7 +1582,7 @@ function guardarPedido(p){
     if(ctrl) ctrl.abort(); ctrl=new AbortController();
     setEstado('Buscando tu perfil…','buscando');window.cariEvent&&cariEvent('search');
     try{
-      const r=await fetch(APPS_SCRIPT_URL+'?dni='+dni,{signal:ctrl.signal});
+      const r=await fetch(APPS_SCRIPT_URL+'?dni='+dni+'&inv='+encodeURIComponent(INVITACION),{signal:ctrl.signal});
       if(!r.ok) throw new Error('HTTP '+r.status);
       const j=await r.json();
       if(!j||!j.ok) throw new Error((j&&j.error)||'sin datos');
@@ -1552,7 +1629,7 @@ function guardarPedido(p){
 const G={
 1:{n:'Recojo en tienda',i:'🏠',s:[
  ['📝','Tus datos','Primero escribe tu DNI o carnet de extranjería. Si es DNI, tu nombre se completa solo. Luego agrega tu número de WhatsApp.','DNI - CE','45678912'],
- ['📅','Elige el día','Selecciona la fecha en que pasarás por el taller. No puede ser anterior a hoy.','Fecha de recojo','Mañana'],
+ ['📅','Elige el día','Selecciona la fecha en que pasarás por el taller. Antes de las 8:00 pm puedes elegir hoy; después, desde mañana.','Fecha de recojo','Mañana'],
  ['🕙','Elige el horario','Tienes dos franjas: 10:00 a 12:00 o 5:00 a 7:00 de la tarde. Te avisamos 1 hora antes.','Horario de recojo','10:00 – 12:00'],
  ['✅','Confirma','Pulsa Confirmar pedido y revisa que todo esté correcto.','Resumen','Todo en orden'],
  ['💬','Envía por WhatsApp','Presiona Enviar pedido y se abrirá WhatsApp con tu resumen listo.','WhatsApp','Pedido enviado ♥']]},
@@ -1567,7 +1644,7 @@ const G={
  ['📝','Tus datos','Escribe tu DNI o carnet de extranjería; con DNI tu nombre se completa solo. Con carnet de extranjería escribe tu nombre completo. Después tu WhatsApp. Shalom los pide para entregarte.','DNI - CE','45678912'],
  ['🧭','Destino','Elige departamento, provincia y zona de entrega nacional.','Departamento','Arequipa'],
  ['🏢','Punto Shalom','Selecciona la agencia donde recogerás tu pedido.','Punto de entrega','Agencia Centro'],
- ['✈️','Terrestre o aéreo','Escoge cómo viajará tu paquete y la fecha de envío.','Tipo de envío','Terrestre'],
+ ['✈️','Terrestre o aéreo','Escoge cómo viajará tu paquete y la fecha de envío. Antes de las 5:00 pm puedes elegir hoy; después, desde mañana.','Tipo de envío','Terrestre'],
  ['💬','Confirma y envía','Revisa todo con calma y envía tu pedido por WhatsApp.','WhatsApp','Pedido enviado ♥']]},
 4:{n:'Envío Express',i:'⚡',s:[
  ['📝','Tus datos','Escribe tu DNI o carnet de extranjería; con DNI tu nombre se completa solo, con carnet de extranjería lo escribes tú. Luego tu número de WhatsApp.','DNI - CE','45678912'],
@@ -1667,7 +1744,7 @@ const INFO={
 2:{i:'🛵',n:'Envío motorizado',t:'Courier en <b>Lima y Callao</b> con fecha programada. Antes de las <b>8:00 am</b> puedes elegir hoy; después, desde mañana. Llega en la fecha elegida, entre las <b>12:00 pm y las 7:00 pm</b> (sin horario fijo). El costo depende de tu distrito.'},
 3:{i:'📦',n:'Envío Shalom',t:'Entrega a <b>nivel nacional</b> vía agencia Shalom, por vía <b>terrestre o aérea</b>. Eliges el punto de entrega y Shalom pide tu DNI o carnet.'},
 4:{i:'⚡',n:'Envío Express',t:'Entrega <b>el mismo día</b>, solo en <b>Lima y Callao</b>, sujeta a horario y disponibilidad. Es <b>previo pago del total del pedido</b>; el costo de envío se paga al motorizado cuando llegue con tu pedido.'}};
-const TIPS={dni:'Escribe tu DNI o carnet de extranjería. Con DNI, tu nombre se completa solo ✨',nombres:'Tu nombre completo, tal como figura en tu documento 📝',telefono:'Tu número de WhatsApp: por ahí te escribiremos 💚',departamento:'Elige tu departamento para ver las opciones 🧭',provincia:'Ahora tu provincia 📍',zona:'Elige tu zona o distrito ✨',lugarEntrega:'Elige la agencia Shalom donde recogerás tu pedido 🏢',direccion:'Calle, número e interior. ¡Mientras más claro, mejor llega! 🏡',referencia:'Una referencia ayuda mucho al courier: portón, parque cercano… 🛵',ubicacionMaps:'Opcional: pega el enlace de tu ubicación de Google Maps 🗺️',fechaRecojo:'¿Qué día pasarás por el taller? No puede ser antes de hoy 📅',fechaMotorizado:'Antes de las 8:00 am puedes elegir hoy; después, desde mañana. Llega esa fecha entre 12:00 pm y 7:00 pm, sin hora fija 🛵',fechaExpress:'Elige la fecha express, desde hoy. Recuerda: pagas el pedido antes y el envío al motorizado cuando llegue ⚡',fechaShalom:'¿Qué día enviamos tu paquete? 📦'};
+const TIPS={dni:'Escribe tu DNI o carnet de extranjería. Con DNI, tu nombre se completa solo ✨',nombres:'Tu nombre completo, tal como figura en tu documento 📝',telefono:'Tu número de WhatsApp: por ahí te escribiremos 💚',departamento:'Elige tu departamento para ver las opciones 🧭',provincia:'Ahora tu provincia 📍',zona:'Elige tu zona o distrito ✨',lugarEntrega:'Elige la agencia Shalom donde recogerás tu pedido 🏢',direccion:'Calle, número e interior. ¡Mientras más claro, mejor llega! 🏡',referencia:'Una referencia ayuda mucho al courier: portón, parque cercano… 🛵',ubicacionMaps:'Opcional: pega el enlace de tu ubicación de Google Maps 🗺️',fechaRecojo:'¿Qué día pasarás por el taller? Antes de las 8:00 pm puedes elegir hoy; después, desde mañana 📅',fechaMotorizado:'Antes de las 8:00 am puedes elegir hoy; después, desde mañana. Llega esa fecha entre 12:00 pm y 7:00 pm, sin hora fija 🛵',fechaExpress:'Elige la fecha express, desde hoy. Recuerda: pagas el pedido antes y el envío al motorizado cuando llegue ⚡',fechaShalom:'¿Qué día enviamos tu paquete? Antes de las 5:00 pm puedes elegir hoy; después, desde mañana 📦'};
 const IDLE=['¿Dudas con tu envío? Tócame y te ayudo 💬','Con tu DNI se completa tu nombre solo ✨','¡Tu pedido va a quedar precioso! 💚','Tip: antes de enviar, revisa bien tus datos 👀','Puedo decirte cuánto cuesta el envío a tu distrito 🛵','Tócame para ver horarios, costos y agencias 📦','Cada detalle cuenta: ¡qué buena elección! ✨'];
 let root,bub,fx,panel,body,S,helloDone=false;
 function modalOn(){const m=$('modalEnvio');return m&&getComputedStyle(m).display!=='none'}
@@ -1722,7 +1799,7 @@ const VIEWS={
 menu:()=>bubble('¡Hola! Soy <b>Cari</b> 💚 Estoy aquí para ayudarte con tu envío. ¿Qué necesitas?')+chips([['📦','Tipos de envío','tipos'],['💰','Costo a mi distrito','costo'],['⏰','Horarios y plazos','horarios'],['🏢','Agencias Shalom','shalom'],['📝','Ayuda con mi formulario','form'],['▶','Guías paso a paso','guias'],['❓','Preguntas frecuentes','faq']]),
 tipos:()=>bubble('Tenemos <b>4 formas</b> de recibir tu pedido:')+[1,2,3,4].map(t=>'<div class="ci"><b>'+INFO[t].i+' '+INFO[t].n+'</b><p>'+INFO[t].t+'</p><div class="cr"><button data-a="pick" data-t="'+t+'">Elegir este</button><button data-a="guia" data-t="'+t+'">▶ Guía</button></div></div>').join(''),
 costo:()=>bubble('El <b>envío motorizado</b> (Lima y Callao) depende de tu distrito. Elige el tuyo y te digo el costo 🛵')+'<select data-sel="costo">'+'<option value="" disabled selected>Selecciona tu distrito</option>'+[...preciosMotorizado].sort((a,b)=>a.distrito.localeCompare(b.distrito,'es',{sensitivity:'base'})).map(d=>'<option value="'+esc(d.distrito)+'">'+esc(d.distrito)+'</option>').join('')+'</select><div id="cOut"></div>',
-horarios:()=>bubble('Estos son los <b>horarios y plazos</b> de cada envío ⏰')+'<div class="ci"><b>🏠 Recojo en tienda</b><p>Franjas: 10:00–12:00 y 5:00–7:00 pm. Te avisamos 1 hora antes. La fecha no puede ser anterior a hoy.</p></div><div class="ci"><b>🛵 Motorizado</b><p>Antes de las 8:00 am puedes elegir hoy; después, solo fechas posteriores a hoy. La entrega es en la fecha elegida, de 12:00 pm a 7:00 pm, sin horario fijo.</p></div><div class="ci"><b>⚡ Express</b><p>Mismo día en Lima y Callao, sujeto a horario y disponibilidad. Previo pago del total del pedido; el costo de envío se paga al motorizado cuando llegue.</p></div><div class="ci"><b>📦 Shalom</b><p>Terrestre o aéreo, tú eliges la fecha de envío. Los tiempos de llegada los define Shalom.</p></div><p class="cn">¿Otra duda de plazos? Escríbele a Rut por WhatsApp 💬</p>',
+horarios:()=>bubble('Estos son los <b>horarios y plazos</b> de cada envío ⏰')+'<div class="ci"><b>🏠 Recojo en tienda</b><p>Franjas: 10:00–12:00 y 5:00–7:00 pm. Te avisamos 1 hora antes. Antes de las 8:00 pm puedes elegir hoy; después, desde mañana.</p></div><div class="ci"><b>🛵 Motorizado</b><p>Antes de las 8:00 am puedes elegir hoy; después, solo fechas posteriores a hoy. La entrega es en la fecha elegida, de 12:00 pm a 7:00 pm, sin horario fijo.</p></div><div class="ci"><b>⚡ Express</b><p>Mismo día en Lima y Callao, sujeto a horario y disponibilidad. Previo pago del total del pedido; el costo de envío se paga al motorizado cuando llegue.</p></div><div class="ci"><b>📦 Shalom</b><p>Terrestre o aéreo. Antes de las 5:00 pm puedes elegir hoy como fecha de envío; después, desde mañana. Los tiempos de llegada los define Shalom.</p></div><p class="cn">¿Otra duda de plazos? Escríbele a Rut por WhatsApp 💬</p>',
 shalom:()=>{const d=S.sh.d,p=S.sh.p,z=S.sh.z;let h=bubble('Busca la <b>agencia Shalom</b> más cercana a ti 🏢');
 h+='<select data-sel="sd">'+opts(sortK(shalomData),d,'Departamento')+'</select>';
 if(d)h+='<select data-sel="sp">'+opts(sortK(shalomData[d]),p,'Provincia')+'</select>';
@@ -1827,8 +1904,8 @@ const ORDER=['dni','nombres','telefono','departamento','provincia','zona','lugar
 const CHK={dni:()=>{const v=$('dni').value.trim();return tipoEnvioSeleccionado===2?(!v||/^\d{8,11}$/.test(v)):/^\d{8,11}$/.test(v)},
 nombres:()=>$('nombres').value.trim().length>=3,telefono:()=>/^\d{7,12}$/.test($('telefono').value.trim()),
 departamento:()=>!!$('departamento').value,provincia:()=>!!$('provincia').value,zona:()=>!!$('zona').value,lugarEntrega:()=>!!$('lugarEntrega').value,
-direccion:()=>$('direccion').value.trim().length>=5,fechaRecojo:()=>$('fechaRecojo').value>=getHoy(),horarioRecojo:()=>!!horarioRecojoSeleccionado,
-fechaMotorizado:()=>$('fechaMotorizado').value>=getMinFechaMotorizado(),fechaExpress:()=>$('fechaExpress').value>=getHoy(),fechaShalom:()=>$('fechaShalom').value>=getHoy()};
+direccion:()=>$('direccion').value.trim().length>=5,fechaRecojo:()=>$('fechaRecojo').value>=getMinFechaRecojo(),horarioRecojo:()=>!!horarioRecojoSeleccionado,
+fechaMotorizado:()=>$('fechaMotorizado').value>=getMinFechaMotorizado(),fechaExpress:()=>$('fechaExpress').value>=getHoy(),fechaShalom:()=>$('fechaShalom').value>=getMinFechaShalom()};
 const CMSG={dni:()=>'Escribe tu DNI o carnet de extranjería 👇 Si ya compraste antes, te reconozco ✨',nombres:()=>'Ahora tu nombre completo 📝',telefono:()=>'Tu número de WhatsApp 📱',departamento:()=>'Elige tu departamento 🧭',provincia:()=>'Ahora tu provincia 📍',
 zona:()=>tipoEnvioSeleccionado===3?'Elige tu zona / distrito 🧭':'Elige tu distrito 📍',lugarEntrega:()=>'Elige la agencia Shalom donde recogerás 🏢',direccion:()=>'Escribe tu dirección de entrega 🏡',
 fechaRecojo:()=>'Elige el día que pasarás por el taller 📅',horarioRecojo:()=>'Elige tu horario de recojo 🕙',fechaMotorizado:()=>'Elige la fecha de entrega (llega entre 12:00 pm y 7:00 pm) 📅',fechaExpress:()=>'Elige la fecha de entrega express ⚡',fechaShalom:()=>'Elige la fecha de envío 📦'};
